@@ -70,8 +70,23 @@
       justify-content: center;
       align-items: center;
       z-index: 1;
-      opacity: 0;            /* HIDDEN AT FIRST */
+      opacity: 0;       
       transition: opacity 0.8s ease;
+    }
+
+    #settingsIcon {
+      position: absolute;
+      top: 28px;
+      right: 28px;
+      font-size: 26px;
+      cursor: pointer;
+      opacity: 0.85;
+      user-select: none;
+      transition: opacity 0.2s ease;
+    }
+
+    #settingsIcon:hover {
+      opacity: 1;
     }
 
     #affirmation {
@@ -83,7 +98,7 @@
       font-size: 26px;
       font-weight: 500;
       opacity: 0;
-      filter: blur(6px);
+      filter: blur(7px);
       transition:
         opacity 0.9s ease,
         transform 1.2s cubic-bezier(0.19, 1, 0.22, 1),
@@ -128,6 +143,69 @@
       text-align: center;
     }
 
+
+    /* ================================
+       UPGRADE SCREEN (MODAL)
+       ================================ */
+    #upgradeScreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(14px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .upgradeBox {
+      background: rgba(255,255,255,0.1);
+      padding: 32px 26px;
+      border-radius: 22px;
+      text-align: center;
+      width: 80%;
+      max-width: 360px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      backdrop-filter: blur(22px);
+    }
+
+    .upgradeTitle {
+      font-size: 32px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .upgradeSubtitle {
+      opacity: 0.9;
+      margin-bottom: 22px;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .comingSoon {
+      font-size: 15px;
+      opacity: 0.7;
+      margin-top: 14px;
+    }
+
+    .closeUpgrade {
+      margin-top: 22px;
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.85);
+      color: #616b80;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+    }
+
   </style>
 </head>
 
@@ -139,16 +217,40 @@
     <div class="tagline">just breathe</div>
   </div>
 
-  <!-- Main screen (hidden initially) -->
+  <!-- Main screen -->
   <div id="main">
+
+    <!-- Settings Icon -->
+    <div id="settingsIcon">⚙️</div>
+
+    <!-- Affirmation text -->
     <div id="affirmation"></div>
 
+    <!-- Tap Button -->
     <div class="circle-button" id="tapButton">
       tap me
     </div>
 
+    <!-- Micro text -->
     <div id="microtext">ready when you are</div>
   </div>
+
+
+  <!-- Upgrade Screen Modal -->
+  <div id="upgradeScreen">
+    <div class="upgradeBox">
+      <div class="upgradeTitle">you plus</div>
+      <div class="upgradeSubtitle">
+        deeper calm, deeper connection.<br><br>
+        personalized affirmations and more coming soon.
+      </div>
+
+      <div class="comingSoon">upgrade coming soon</div>
+
+      <div class="closeUpgrade">close</div>
+    </div>
+  </div>
+
 
   <script>
 
@@ -164,16 +266,18 @@
       const main = document.getElementById("main");
 
       launch.style.display = "none";
-      main.style.opacity = 1;     /* NOW main fades in */
+      main.style.opacity = 1;
     }, 2100);
 
 
+    /* Affirmations */
     const affirmations = [
       "You’re doing better than you think.",
       "You are enough, always.",
-      "Breathe. You’re safe.",
-      "Today is yours to shape.",
-      "You have more strength than you realize."
+      "Just breathe. You’re safe.",
+      "There’s calm inside you. Let it surface.",
+      "Your strength is so much bigger than today.",
+      "You deserve kindness, especially from yourself."
     ];
 
     const affirmationBox = document.getElementById("affirmation");
@@ -193,6 +297,23 @@
         affirmationBox.style.filter = "blur(0px)";
       }, 250);
     });
+
+
+    /* Settings → Upgrade Modal */
+    const settingsIcon = document.getElementById("settingsIcon");
+    const upgradeScreen = document.getElementById("upgradeScreen");
+    const closeUpgrade = document.querySelector(".closeUpgrade");
+
+    settingsIcon.addEventListener("click", () => {
+      upgradeScreen.style.opacity = 1;
+      upgradeScreen.style.pointerEvents = "all";
+    });
+
+    closeUpgrade.addEventListener("click", () => {
+      upgradeScreen.style.opacity = 0;
+      upgradeScreen.style.pointerEvents = "none";
+    });
+
   </script>
 
 </body>
