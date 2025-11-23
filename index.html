@@ -6,9 +6,6 @@
   <title>You</title>
 
   <style>
-    /* 
-      Background gradient: lavender to soft slate 
-    */
     body {
       margin: 0;
       padding: 0;
@@ -17,14 +14,24 @@
       font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       color: white;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     /* ================================
-       LAUNCH SCREEN
+       FIXED LAUNCH SCREEN
        ================================ */
+    #launch {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10; /* launch stays on top */
+      background: inherit; /* use same gradient */
+    }
 
     .logo {
       font-size: 48px;
@@ -32,7 +39,6 @@
       opacity: 0;
       animation: fadeIn 1.2s ease forwards;
       letter-spacing: 1px;
-      text-align: center;
     }
 
     .tagline {
@@ -40,7 +46,6 @@
       font-size: 18px;
       opacity: 0;
       animation: fadeIn 1.6s ease forwards;
-      text-align: center;
     }
 
     @keyframes fadeIn {
@@ -52,7 +57,7 @@
 
 
     /* ================================
-       MAIN SCREEN LAYOUT (locked center)
+       MAIN SCREEN
        ================================ */
 
     #main {
@@ -62,13 +67,11 @@
       height: 100vh;
       width: 100vw;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      text-align: center;
+      z-index: 1;
     }
 
-    /* Affirmation text with breath animation foundation */
     #affirmation {
       position: absolute;
       top: 22%;
@@ -85,7 +88,6 @@
         filter 0.9s ease;
     }
 
-    /* Centered circular button */
     .circle-button {
       width: 140px;
       height: 140px;
@@ -109,14 +111,12 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     }
 
-    /* Soft meditation-like pulse */
     @keyframes softPulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.015); }
       100% { transform: scale(1); }
     }
 
-    /* Micro text sits under the button */
     #microtext {
       position: absolute;
       top: calc(50% + 110px);
@@ -137,9 +137,8 @@
     <div class="tagline">just breathe</div>
   </div>
 
-  <!-- MAIN SCREEN -->
+  <!-- Main screen -->
   <div id="main" class="hidden">
-
     <div id="affirmation"></div>
 
     <div class="circle-button" id="tapButton">
@@ -150,13 +149,12 @@
   </div>
 
   <script>
-    /* Transition from launch to main */
+    /* Keep launch visible for 1.3 seconds */
     setTimeout(() => {
       document.getElementById("launch").classList.add("hidden");
       document.getElementById("main").classList.remove("hidden");
     }, 1300);
 
-    /* Placeholder affirmations */
     const affirmations = [
       "You’re doing better than you think.",
       "You are enough, always.",
@@ -169,18 +167,14 @@
     const tapButton = document.getElementById("tapButton");
 
     tapButton.addEventListener("click", () => {
-      const randomIndex = Math.floor(Math.random() * affirmations.length);
-      const message = affirmations[randomIndex];
+      const message = affirmations[Math.floor(Math.random() * affirmations.length)];
 
-      /* Breath exhale: fade + drift down + blur */
       affirmationBox.style.opacity = 0;
       affirmationBox.style.transform = "translate(-50%, 10px)";
       affirmationBox.style.filter = "blur(8px)";
 
       setTimeout(() => {
         affirmationBox.textContent = message;
-
-        /* Breath inhale: fade in + drift up + clear */
         affirmationBox.style.opacity = 1;
         affirmationBox.style.transform = "translate(-50%, 0px)";
         affirmationBox.style.filter = "blur(0px)";
