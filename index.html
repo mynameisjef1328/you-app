@@ -153,11 +153,12 @@
       left: 0;
       height: 100vh;
       width: 100vw;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.28);
       backdrop-filter: blur(14px);
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
+      padding-top: 60px;
       flex-direction: column;
       z-index: 20;
       opacity: 0;
@@ -166,37 +167,55 @@
     }
 
     .upgradeBox {
-      background: rgba(255,255,255,0.1);
-      padding: 32px 26px;
+      background: rgba(255,255,255,0.08);
+      padding: 26px 24px;
       border-radius: 22px;
-      text-align: center;
-      width: 80%;
+      text-align: left;
+      width: 82%;
       max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
       box-shadow: 0 8px 30px rgba(0,0,0,0.25);
       backdrop-filter: blur(22px);
+      color: white;
     }
 
     .upgradeTitle {
       font-size: 32px;
-      margin-bottom: 10px;
       font-weight: 600;
+      text-align: center;
+      margin-bottom: 4px;
     }
 
     .upgradeSubtitle {
       opacity: 0.9;
-      margin-bottom: 22px;
+      text-align: center;
+      margin-bottom: 26px;
       font-size: 16px;
       line-height: 1.4;
     }
 
-    .comingSoon {
-      font-size: 15px;
-      opacity: 0.7;
-      margin-top: 14px;
+    .featureItem {
+      margin-bottom: 22px;
+      line-height: 1.45;
+      font-size: 16px;
+    }
+
+    .featureItem span {
+      font-weight: 700;
+      margin-right: 6px;
+    }
+
+    .comingHeader {
+      margin-top: 10px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      opacity: 0.85;
+      text-align: center;
     }
 
     .closeUpgrade {
-      margin-top: 22px;
+      margin-top: 26px;
       padding: 12px 20px;
       background: rgba(255,255,255,0.85);
       color: #616b80;
@@ -204,6 +223,7 @@
       cursor: pointer;
       font-weight: 600;
       user-select: none;
+      text-align: center;
     }
 
   </style>
@@ -220,18 +240,14 @@
   <!-- Main screen -->
   <div id="main">
 
-    <!-- Settings Icon -->
     <div id="settingsIcon">⚙️</div>
 
-    <!-- Affirmation text -->
     <div id="affirmation"></div>
 
-    <!-- Tap Button -->
     <div class="circle-button" id="tapButton">
       tap me
     </div>
 
-    <!-- Micro text -->
     <div id="microtext">ready when you are</div>
   </div>
 
@@ -239,13 +255,59 @@
   <!-- Upgrade Screen Modal -->
   <div id="upgradeScreen">
     <div class="upgradeBox">
+
       <div class="upgradeTitle">you plus</div>
       <div class="upgradeSubtitle">
-        deeper calm, deeper connection.<br><br>
-        personalized affirmations and more coming soon.
+        deeper calm, deeper connection
       </div>
 
-      <div class="comingSoon">upgrade coming soon</div>
+      <!-- Calm-style soft feature list -->
+      <div class="featureItem">
+        <span>✓</span> custom calming backgrounds<br>
+        Soft gradients, dark modes, and warm tones.
+      </div>
+
+      <div class="featureItem">
+        <span>✓</span> breathing animations<br>
+        Gentle inhale-exhale motion styles.
+      </div>
+
+      <div class="featureItem">
+        <span>✓</span> button styles<br>
+        Circle, pill, square, and more.
+      </div>
+
+      <div class="featureItem">
+        <span>✓</span> unlimited taps<br>
+        No limits. No restrictions.
+      </div>
+
+      <div class="featureItem">
+        <span>✓</span> affirmation history<br>
+        Revisit your past moments of calm.
+      </div>
+
+      <div class="featureItem">
+        <span>✓</span> favorites<br>
+        Save the ones that hit your heart.
+      </div>
+
+      <div class="featureItem">
+        <span>✓</span> deeper affirmations<br>
+        Premium long-form messages.
+      </div>
+
+      <div class="comingHeader">— coming soon —</div>
+
+      <div class="featureItem">
+        <span>✓</span> personalized AI support<br>
+        Affirmations based on your mood and day.
+      </div>
+
+      <div class="featureItem">
+        <span>✓</span> gift a friend<br>
+        Share calm with someone who needs it.
+      </div>
 
       <div class="closeUpgrade">close</div>
     </div>
