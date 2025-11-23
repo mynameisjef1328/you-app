@@ -13,35 +13,36 @@
       margin: 0;
       padding: 0;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
       background: linear-gradient(to bottom, #c9b6e4, #616b80);
       font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       color: white;
-      text-align: center;
       overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    /* Launch screen logo */
+    /* ================================
+       LAUNCH SCREEN STYLES
+       ================================ */
+
     .logo {
       font-size: 48px;
       font-weight: 600;
       opacity: 0;
       animation: fadeIn 1.2s ease forwards;
       letter-spacing: 1px;
+      text-align: center;
     }
 
-    /* Launch screen tagline */
     .tagline {
       margin-top: 12px;
       font-size: 18px;
       opacity: 0;
       animation: fadeIn 1.6s ease forwards;
+      text-align: center;
     }
 
-    /* Fade animation */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -49,22 +50,41 @@
 
     .hidden { display: none; }
 
-    /* 
-      MAIN SCREEN STYLES 
-      --------------------------------------
-    */
 
-    /* Affirmation text container (empty until tap) */
+    /* ================================
+       MAIN SCREEN LAYOUT (locked center)
+       ================================ */
+
+    #main {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      text-align: center;
+      pointer-events: auto;
+    }
+
+    /* Affirmation text FIXED above the button */
     #affirmation {
+      position: absolute;
+      top: 20%;
+      width: 80%;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 26px;
       font-weight: 500;
       opacity: 0;
       transition: opacity 0.6s ease;
-      max-width: 80%;
-      margin-bottom: 40px;
     }
 
-    /* Circular button */
+    /* Centered circular button */
     .circle-button {
       width: 140px;
       height: 140px;
@@ -80,30 +100,29 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.25);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
       user-select: none;
+      animation: softPulse 3s ease-in-out infinite;
     }
 
-    /* Tap animation */
     .circle-button:active {
       transform: scale(0.96);
       box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     }
 
-    /* Gentle idle pulse animation */
+    /* Soft meditation-like pulse */
     @keyframes softPulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.015); }
       100% { transform: scale(1); }
     }
 
-    .pulse {
-      animation: softPulse 3s ease-in-out infinite;
-    }
-
-    /* Encouraging micro-text */
+    /* Micro text stays put under the button */
     #microtext {
-      margin-top: 18px;
+      position: absolute;
+      top: calc(50% + 110px);
       font-size: 14px;
       opacity: 0.8;
+      width: 100%;
+      text-align: center;
     }
 
   </style>
@@ -119,9 +138,10 @@
 
   <!-- MAIN BUTTON SCREEN -->
   <div id="main" class="hidden">
+
     <div id="affirmation"></div>
 
-    <div class="circle-button pulse" id="tapButton">
+    <div class="circle-button" id="tapButton">
       tap me
     </div>
 
@@ -135,8 +155,7 @@
       document.getElementById("main").classList.remove("hidden");
     }, 1300);
 
-    /* List of sample affirmations for now.
-       We replace these later with your real engine. */
+    /* Placeholder affirmations */
     const affirmations = [
       "You’re doing better than you think.",
       "You are enough, always.",
