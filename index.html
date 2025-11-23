@@ -18,7 +18,7 @@
     }
 
     /* ================================
-       FIXED LAUNCH SCREEN
+       LAUNCH SCREEN
        ================================ */
     #launch {
       position: absolute;
@@ -31,9 +31,8 @@
       justify-content: center;
       align-items: center;
       z-index: 10;
-      transition: opacity 0.8s ease;
       opacity: 1;
-      pointer-events: auto;
+      transition: opacity 0.8s ease;
     }
 
     .logo {
@@ -60,6 +59,7 @@
     /* ================================
        MAIN SCREEN
        ================================ */
+
     #main {
       position: absolute;
       top: 0;
@@ -149,12 +149,17 @@
   </div>
 
   <script>
-    /* Smooth fade-out of launch screen */
+    /* Step 1: Fade out launch */
     setTimeout(() => {
       const launch = document.getElementById("launch");
       launch.style.opacity = 0;
-      launch.style.pointerEvents = "none";
     }, 1200);
+
+    /* Step 2: Remove launch from layout after fade */
+    setTimeout(() => {
+      const launch = document.getElementById("launch");
+      launch.style.display = "none";
+    }, 2100);
 
 
     const affirmations = [
