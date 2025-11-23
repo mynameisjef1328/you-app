@@ -70,6 +70,8 @@
       justify-content: center;
       align-items: center;
       z-index: 1;
+      opacity: 0;            /* HIDDEN AT FIRST */
+      transition: opacity 0.8s ease;
     }
 
     #affirmation {
@@ -137,7 +139,7 @@
     <div class="tagline">just breathe</div>
   </div>
 
-  <!-- Main screen -->
+  <!-- Main screen (hidden initially) -->
   <div id="main">
     <div id="affirmation"></div>
 
@@ -149,16 +151,20 @@
   </div>
 
   <script>
-    /* Step 1: Fade out launch */
+
+    /* Fade OUT launch screen */
     setTimeout(() => {
       const launch = document.getElementById("launch");
       launch.style.opacity = 0;
     }, 1200);
 
-    /* Step 2: Remove launch from layout after fade */
+    /* Remove launch + FADE IN main */
     setTimeout(() => {
       const launch = document.getElementById("launch");
+      const main = document.getElementById("main");
+
       launch.style.display = "none";
+      main.style.opacity = 1;     /* NOW main fades in */
     }, 2100);
 
 
