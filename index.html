@@ -70,7 +70,7 @@
       justify-content: center;
       align-items: center;
       z-index: 1;
-      opacity: 0;       
+      opacity: 0;
       transition: opacity 0.8s ease;
     }
 
@@ -148,32 +148,26 @@
        UPGRADE SCREEN (MODAL)
        ================================ */
     #upgradeScreen {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
-      height: 100vh;
       width: 100vw;
+      height: 100vh;
       background: rgba(0,0,0,0.28);
       backdrop-filter: blur(14px);
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding-top: 60px;
-      padding-bottom: 160px;           /* ⬅ bigger cushion for the close button */
+      align-items: center;
       flex-direction: column;
       z-index: 20;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease;
-    
-      /* make the upgrade area scrollable on small screens */
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     .upgradeBox {
       background: rgba(255,255,255,0.08);
-      padding: 26px 24px;
+      padding: 26px 24px 34px;
       border-radius: 22px;
       text-align: left;
       width: 82%;
@@ -183,6 +177,11 @@
       box-shadow: 0 8px 30px rgba(0,0,0,0.25);
       backdrop-filter: blur(22px);
       color: white;
+
+      /* make the content scrollable inside the card */
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .upgradeTitle {
@@ -301,7 +300,6 @@
         Premium long-form messages.
       </div>
 
-      <!-- updated header without em dash -->
       <div class="comingHeader">- coming soon -</div>
 
       <div class="featureItem">
@@ -314,7 +312,6 @@
         Share "you" with someone who needs it.
       </div>
 
-      <!-- new charity giving line -->
       <div class="featureItem">
         <span>✓</span> charity giving option<br>
         Choose to direct a portion of your plan to mental health charities.
@@ -326,7 +323,6 @@
 
 
   <script>
-
     /* Fade OUT launch screen */
     setTimeout(() => {
       const launch = document.getElementById("launch");
@@ -386,7 +382,6 @@
       upgradeScreen.style.opacity = 0;
       upgradeScreen.style.pointerEvents = "none";
     });
-
   </script>
 
 </body>
