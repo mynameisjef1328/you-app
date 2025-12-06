@@ -145,7 +145,7 @@
 
 
     /* ================================
-       UPGRADE SCREEN (MODAL)
+       INFO / UPGRADE SCREEN (MODAL)
        ================================ */
     #upgradeScreen {
       position: fixed;
@@ -178,29 +178,51 @@
       backdrop-filter: blur(22px);
       color: white;
 
-      /* make the content scrollable inside the card */
       max-height: calc(100vh - 80px);
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
 
+    .sectionLabel {
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      font-size: 11px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+
+    .aboutText {
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.9;
+      margin-bottom: 18px;
+    }
+
+    .divider {
+      height: 1px;
+      width: 100%;
+      background: rgba(255,255,255,0.18);
+      margin: 18px 0 22px;
+      border-radius: 999px;
+    }
+
     .upgradeTitle {
-      font-size: 32px;
+      font-size: 24px;
       font-weight: 600;
-      text-align: center;
+      text-align: left;
       margin-bottom: 4px;
     }
 
     .upgradeSubtitle {
       opacity: 0.9;
-      text-align: center;
-      margin-bottom: 26px;
-      font-size: 16px;
+      text-align: left;
+      margin-bottom: 22px;
+      font-size: 14px;
       line-height: 1.4;
     }
 
     .featureItem {
-      margin-bottom: 22px;
+      margin-bottom: 20px;
       line-height: 1.45;
       font-size: 16px;
     }
@@ -211,15 +233,16 @@
     }
 
     .comingHeader {
-      margin-top: 10px;
-      margin-bottom: 12px;
+      margin-top: 8px;
+      margin-bottom: 10px;
       font-weight: 600;
       opacity: 0.85;
-      text-align: center;
+      text-align: left;
+      font-size: 14px;
     }
 
     .closeUpgrade {
-      margin-top: 26px;
+      margin-top: 24px;
       padding: 12px 20px;
       background: rgba(255,255,255,0.85);
       color: #616b80;
@@ -256,13 +279,23 @@
   </div>
 
 
-  <!-- Upgrade Screen Modal -->
+  <!-- Info / Upgrade Screen Modal -->
   <div id="upgradeScreen">
     <div class="upgradeBox">
 
-      <div class="upgradeTitle">you plus</div>
+      <!-- about section -->
+      <div class="sectionLabel">about you</div>
+      <div class="aboutText">
+        A quiet little space that gives you one kind thing to hold at a time. Tap, breathe, read, repeat.
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- you plus section -->
+      <div class="sectionLabel">you plus</div>
+      <div class="upgradeTitle">deeper calm</div>
       <div class="upgradeSubtitle">
-        deeper calm, deeper connection
+        When you are ready for more, you plus lets you shape how your calm feels and looks.
       </div>
 
       <div class="featureItem">
@@ -272,7 +305,7 @@
 
       <div class="featureItem">
         <span>✓</span> breathing animations<br>
-        Gentle inhale-exhale motion styles.
+        Gentle inhale exhale motion styles.
       </div>
 
       <div class="featureItem">
@@ -297,10 +330,13 @@
 
       <div class="featureItem">
         <span>✓</span> deeper affirmations<br>
-        Premium long-form messages.
+        Premium long form messages.
       </div>
 
-      <div class="comingHeader">- coming soon -</div>
+      <div class="divider"></div>
+
+      <!-- what's next section -->
+      <div class="comingHeader">what's next</div>
 
       <div class="featureItem">
         <span>✓</span> personalized AI support<br>
@@ -373,7 +409,7 @@
     });
 
 
-    /* Settings → Upgrade Modal */
+    /* Ellipsis → Info / Upgrade Modal */
     const settingsIcon = document.getElementById("settingsIcon");
     const upgradeScreen = document.getElementById("upgradeScreen");
     const closeUpgrade = document.querySelector(".closeUpgrade");
