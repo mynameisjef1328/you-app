@@ -159,11 +159,16 @@
       justify-content: center;
       align-items: flex-start;
       padding-top: 60px;
+      padding-bottom: 40px;           /* extra breathing room at bottom */
       flex-direction: column;
       z-index: 20;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease;
+    
+      /* make the upgrade area scrollable on small screens */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .upgradeBox {
