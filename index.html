@@ -147,41 +147,54 @@
     /* ================================
        INFO / UPGRADE SCREEN (MODAL)
        ================================ */
-    #upgradeScreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.28);
-      backdrop-filter: blur(14px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 20;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-    }
+#upgradeScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
 
-    .upgradeBox {
-      background: rgba(255,255,255,0.08);
-      padding: 26px 24px 34px;
-      border-radius: 22px;
-      text-align: left;
-      width: 82%;
-      max-width: 360px;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      backdrop-filter: blur(22px);
-      color: white;
+.upgradeBox {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 32px 26px;
+  border-radius: 22px;
+  text-align: left;
+  width: 84%;
+  max-width: 380px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  color: white;
 
-      max-height: calc(100vh - 80px);
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* When upgrade is open, soften / hide the main layer */
+body.showing-upgrade #main {
+  filter: blur(8px);
+  transform: scale(1.01);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+body.showing-upgrade #tapButton,
+body.showing-upgrade #microtext {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
 
     .sectionLabel {
       text-transform: uppercase;
@@ -420,20 +433,18 @@
 
 
     /* Ellipsis → Info / Upgrade Modal */
-    const settingsIcon = document.getElementById("settingsIcon");
-    const upgradeScreen = document.getElementById("upgradeScreen");
-    const closeUpgrade = document.querySelector(".closeUpgrade");
-
     settingsIcon.addEventListener("click", () => {
-      upgradeScreen.style.opacity = 1;
-      upgradeScreen.style.pointerEvents = "all";
-    });
+  document.body.classList.add("showing-upgrade");
+  upgradeScreen.style.opacity = 1;
+  upgradeScreen.style.pointerEvents = "all";
+});
 
-    closeUpgrade.addEventListener("click", () => {
-      upgradeScreen.style.opacity = 0;
-      upgradeScreen.style.pointerEvents = "none";
-    });
-  </script>
-
+closeUpgrade.addEventListener("click", () => {
+  document.body.classList.remove("showing-upgrade");
+  upgradeScreen.style.opacity = 0;
+  upgradeScreen.style.pointerEvents = "none";
+});
+    
+</script>
 </body>
 </html>
