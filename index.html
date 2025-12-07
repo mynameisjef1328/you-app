@@ -103,6 +103,7 @@
         opacity 0.9s ease,
         transform 1.2s cubic-bezier(0.19, 1, 0.22, 1),
         filter 0.9s ease;
+      text-align: center;
     }
 
     .circle-button {
@@ -147,54 +148,54 @@
     /* ================================
        INFO / UPGRADE SCREEN (MODAL)
        ================================ */
-#upgradeScreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
-  background: rgba(0, 0, 0, 0.35);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 20;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.45s ease;
-}
+    #upgradeScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background: rgba(0, 0, 0, 0.35);
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s ease;
+    }
 
-.upgradeBox {
-  background: rgba(255, 255, 255, 0.12);
-  padding: 32px 26px;
-  border-radius: 22px;
-  text-align: left;
-  width: 84%;
-  max-width: 380px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  color: white;
+    .upgradeBox {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 32px 26px;
+      border-radius: 22px;
+      text-align: left;
+      width: 84%;
+      max-width: 380px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      color: white;
 
-  max-height: calc(100vh - 80px);
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-}
+      max-height: calc(100vh - 80px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
-/* When upgrade is open, soften / hide the main layer */
-body.showing-upgrade #main {
-  filter: blur(8px);
-  transform: scale(1.01);
-  transition: filter 0.3s ease, transform 0.3s ease;
-}
+    /* When upgrade is open, soften / hide the main layer */
+    body.showing-upgrade #main {
+      filter: blur(8px);
+      transform: scale(1.01);
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
 
-body.showing-upgrade #tapButton,
-body.showing-upgrade #microtext {
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
+    body.showing-upgrade #tapButton,
+    body.showing-upgrade #microtext {
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
 
     .sectionLabel {
       text-transform: uppercase;
@@ -393,31 +394,200 @@ body.showing-upgrade #microtext {
       launch.style.opacity = 0;
     }, 1200);
 
-    /* Remove launch + FADE IN main */
+    /* Remove launch + FADE IN main, then show first affirmation */
     setTimeout(() => {
       const launch = document.getElementById("launch");
       const main = document.getElementById("main");
 
       launch.style.display = "none";
       main.style.opacity = 1;
+
+      // show first affirmation once main is visible
+      showNextAffirmation(true);
     }, 2100);
 
 
-    /* Affirmations */
+    /* ================================
+       AFFIRMATIONS LIST
+       ================================ */
+
     const affirmations = [
-      "You’re doing better than you think.",
-      "You are enough, always.",
-      "Just breathe. You’re safe.",
-      "There’s calm inside you. Let it surface.",
-      "Your strength is so much bigger than today.",
-      "You deserve kindness, especially from yourself."
+      "You are allowed to rest without earning it first.",
+      "You are doing better than you give yourself credit for.",
+      "You are enough exactly as you are today.",
+      "You are allowed to take up space and be seen.",
+      "You have survived every hard day so far.",
+      "Your presence in this world matters more than you know.",
+      "You are allowed to start again, even in the middle of the day.",
+      "You are worthy of love, care, and gentleness.",
+      "You are not behind, you are on your own timeline.",
+      "You do not have to fix everything today.",
+      "Your feelings are valid, even if others do not understand them.",
+      "You are allowed to move slowly, progress is still progress.",
+      "You are worthy of compassion, especially your own.",
+      "You have permission to breathe and let your shoulders drop.",
+      "You are growing in ways you cannot yet see.",
+      "You are allowed to say no without explaining why.",
+      "You are not your worst day or your worst mistake.",
+      "You are allowed to take breaks without feeling guilty.",
+      "You are worthy of good things, even when you feel messy inside.",
+      "You are strong, even when you feel fragile.",
+      "You are allowed to feel proud of how far you have come.",
+      "You are more resilient than this moment makes you feel.",
+      "You are allowed to ask for help and still be strong.",
+      "You are not too much, you are exactly enough.",
+      "You are allowed to feel what you feel without judging it.",
+      "You are doing the best you can with what you have right now.",
+      "You are allowed to choose peace over proving a point.",
+      "You are worthy of the same kindness you give to others.",
+      "You are more loved than your anxious thoughts admit.",
+      "You are allowed to grow out of old versions of yourself.",
+      "You are not a burden for needing support.",
+      "You are allowed to be a work in progress and still be worthy.",
+      "You are learning, healing, and changing, even on quiet days.",
+      "You are allowed to let go of what hurts your heart.",
+      "You are not failing, you are learning what you need.",
+      "You are allowed to make small steps and call them victories.",
+      "You are worthy of taking up emotional and physical space.",
+      "You are allowed to be both grateful and struggling at the same time.",
+      "You are more capable than your self doubt suggests.",
+      "You are allowed to rest before you feel completely exhausted.",
+      "You are not alone, even when it feels that way.",
+      "You are allowed to celebrate tiny wins with your whole heart.",
+      "You are worthy of a life that feels gentle and kind.",
+      "You are allowed to change your mind without apologizing.",
+      "You are not defined by how productive you were today.",
+      "You are allowed to soften, you do not have to be strong every minute.",
+      "You are worthy of patience while you figure things out.",
+      "You are allowed to set boundaries that protect your peace.",
+      "You are not too late to become who you want to be.",
+      "You are allowed to outgrow people and places that no longer fit.",
+      "You are worthy of deep breaths, slow mornings, and quiet nights.",
+      "You are allowed to choose what heals you instead of what hurts.",
+      "You are more brave than this moment gives you credit for.",
+      "You are allowed to take care of your heart without guilt.",
+      "You are not invisible, your existence makes a difference.",
+      "You are allowed to unplug and be unavailable for a while.",
+      "You are worthy of tenderness, even on days you feel heavy.",
+      "You are allowed to trust that you are learning what you need.",
+      "You are not broken, you are becoming.",
+      "You are allowed to pause and feel the ground under your feet.",
+      "You are worthy of showing up as your full self.",
+      "You are allowed to rest in progress instead of chasing perfection.",
+      "You are more than what you do for others.",
+      "You are allowed to be both soft and strong at the same time.",
+      "You are worthy of forgiving yourself for what you did not know then.",
+      "You are allowed to protect your energy, even if others do not get it.",
+      "You are not the voice in your head that says you cannot.",
+      "You are allowed to take today one small moment at a time.",
+      "You are worthy of being spoken to gently, especially by yourself.",
+      "You are allowed to grow at a pace that feels kind to you.",
+      "You are not stuck, you are in the middle of becoming.",
+      "You are allowed to leave spaces that dim your light.",
+      "You are worthy of choosing yourself without feeling selfish.",
+      "You are allowed to feel tired without calling yourself lazy.",
+      "You are more than the story your fear is telling you.",
+      "You are allowed to build a life that feels like home.",
+      "You are worthy of quiet days that are only about healing.",
+      "You are allowed to let time and tenderness do their work.",
+      "You are not alone in finding things hard right now.",
+      "You are allowed to loosen your grip and trust the process a little.",
+      "You are worthy of joy that does not have to be earned.",
+      "You are allowed to be proud of surviving what tried to break you.",
+      "You are more gentle than you realize, and that is a strength.",
+      "You are allowed to listen to your body and honor its needs.",
+      "You are not behind, your path is simply different.",
+      "You are allowed to feel hope again, even after disappointment.",
+      "You are worthy of people who are soft with your heart.",
+      "You are allowed to take the next step without seeing the whole path.",
+      "You are not your fear, you are the one noticing it.",
+      "You are allowed to feel everything, then choose what to keep.",
+      "You are worthy of putting your hand on your heart and saying, I am trying.",
+      "You are allowed to trust that some answers will arrive with time.",
+      "You are not a problem to fix, you are a person to support.",
+      "You are allowed to loosen perfection so peace has room to enter.",
+      "You are worthy of healing that unfolds slowly and gently.",
+      "You are allowed to hold space for both grief and hope.",
+      "You are more than your anxious thoughts and racing heart.",
+      "You are allowed to remember that your breath is always here for you.",
+      "You are worthy of a life that feels honest, soft, and true.",
+      "You are allowed to lay it all down for a moment and simply be.",
+      "You are not alone in needing reassurance, many hearts feel this too.",
+      "You are allowed to believe that today does not have to look like yesterday.",
+      "You are worthy of starting small and still being proud.",
+      "You are allowed to trust that you are enough for this moment."
     ];
+
+    /* ================================
+       NON REPEATING LOGIC (QUEUE)
+       ================================ */
+
+    const QUEUE_KEY = "youAffirmationQueue_v1";
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+    }
+
+    function loadQueue() {
+      try {
+        const stored = localStorage.getItem(QUEUE_KEY);
+        if (!stored) return [];
+        const parsed = JSON.parse(stored);
+        if (!Array.isArray(parsed)) return [];
+        return parsed;
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveQueue(queue) {
+      try {
+        localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+
+    function getNextAffirmation() {
+      let queue = loadQueue();
+
+      // if queue empty, build a new shuffled cycle
+      if (!queue || queue.length === 0) {
+        queue = affirmations.map((_, index) => index);
+        shuffle(queue);
+      }
+
+      const nextIndex = queue.shift();
+      saveQueue(queue);
+
+      return affirmations[nextIndex] || affirmations[0];
+    }
+
+    /* ================================
+       DOM HOOKUP AND ANIMATION
+       ================================ */
 
     const affirmationBox = document.getElementById("affirmation");
     const tapButton = document.getElementById("tapButton");
+    const settingsIcon = document.getElementById("settingsIcon");
+    const upgradeScreen = document.getElementById("upgradeScreen");
+    const closeUpgrade = document.querySelector(".closeUpgrade");
 
-    tapButton.addEventListener("click", () => {
-      const message = affirmations[Math.floor(Math.random() * affirmations.length)];
+    function showNextAffirmation(initial = false) {
+      const message = getNextAffirmation();
+
+      if (initial) {
+        affirmationBox.textContent = message;
+        affirmationBox.style.opacity = 1;
+        affirmationBox.style.transform = "translate(-50%, 0px)";
+        affirmationBox.style.filter = "blur(0px)";
+        return;
+      }
 
       affirmationBox.style.opacity = 0;
       affirmationBox.style.transform = "translate(-50%, 10px)";
@@ -429,22 +599,24 @@ body.showing-upgrade #microtext {
         affirmationBox.style.transform = "translate(-50%, 0px)";
         affirmationBox.style.filter = "blur(0px)";
       }, 250);
-    });
+    }
 
+    tapButton.addEventListener("click", () => {
+      showNextAffirmation(false);
+    });
 
     /* Ellipsis → Info / Upgrade Modal */
     settingsIcon.addEventListener("click", () => {
-  document.body.classList.add("showing-upgrade");
-  upgradeScreen.style.opacity = 1;
-  upgradeScreen.style.pointerEvents = "all";
-});
+      document.body.classList.add("showing-upgrade");
+      upgradeScreen.style.opacity = 1;
+      upgradeScreen.style.pointerEvents = "all";
+    });
 
-closeUpgrade.addEventListener("click", () => {
-  document.body.classList.remove("showing-upgrade");
-  upgradeScreen.style.opacity = 0;
-  upgradeScreen.style.pointerEvents = "none";
-});
-    
-</script>
+    closeUpgrade.addEventListener("click", () => {
+      document.body.classList.remove("showing-upgrade");
+      upgradeScreen.style.opacity = 0;
+      upgradeScreen.style.pointerEvents = "none";
+    });
+  </script>
 </body>
 </html>
