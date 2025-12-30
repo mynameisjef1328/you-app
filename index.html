@@ -152,8 +152,12 @@
       position: fixed;
       top: 0;
       left: 0;
-      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
+      min-height: 100vh;
       width: 100vw;
+      padding: 18px;
+      padding-top: calc(18px + env(safe-area-inset-top));
+      padding-bottom: calc(18px + env(safe-area-inset-bottom));
       background: rgba(0, 0, 0, 0.35);
       -webkit-backdrop-filter: blur(18px);
       backdrop-filter: blur(18px);
@@ -179,12 +183,18 @@
       -webkit-backdrop-filter: blur(22px);
       color: white;
 
-      max-height: calc(100vh - 80px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      max-height: calc((var(--vh, 1vh) * 100) - 80px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     /* When upgrade is open, soften / hide the main layer */
+    body.showing-upgrade {
+      overflow: hidden;
+      touch-action: none;
+    }
+
     body.showing-upgrade #main {
       filter: blur(8px);
       transform: scale(1.01);
@@ -274,6 +284,32 @@
       font-style: italic;
     }
 
+  
+    .upgradeContent{
+      flex: 1 1 auto;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 4px;
+      overscroll-behavior: contain;
+    }
+
+    .upgradeFooter{
+      flex: 0 0 auto;
+      margin-top: 14px;
+      padding-top: 14px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(255,255,255,0.20);
+    }
+
+    .closeUpgrade{
+      width: 100%;
+      display: block;
+      border: none;
+      -webkit-appearance: none;
+      appearance: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
   </style>
 </head>
 
@@ -303,6 +339,8 @@
   <!-- Info / Upgrade Screen Modal -->
   <div id="upgradeScreen">
     <div class="upgradeBox">
+
+      <div class="upgradeContent">
 
       <!-- about section -->
       <div class="sectionLabel">about you</div>
@@ -382,12 +420,24 @@
         Choose to direct a portion of your plan to mental health charities.
       </div>
 
-      <div class="closeUpgrade">close</div>
+      </div>
+
+      <div class="upgradeFooter">
+        <button class="closeUpgrade" id="closeUpgrade" type="button">close</button>
+      </div>
     </div>
   </div>
 
 
   <script>
+    /* Fix iOS viewport height issues (Safari/WKWebView) */
+    function setViewportUnit() {
+      document.documentElement.style.setProperty("--vh", (window.innerHeight * 0.01) + "px");
+    }
+    setViewportUnit();
+    window.addEventListener("resize", setViewportUnit);
+    window.addEventListener("orientationchange", setViewportUnit);
+
     /* Fade OUT launch screen */
     setTimeout(() => {
       const launch = document.getElementById("launch");
@@ -573,7 +623,7 @@
     const tapButton = document.getElementById("tapButton");
     const settingsIcon = document.getElementById("settingsIcon");
     const upgradeScreen = document.getElementById("upgradeScreen");
-    const closeUpgrade = document.querySelector(".closeUpgrade");
+    const closeUpgrade = document.getElementById("closeUpgrade") || document.querySelector(".closeUpgrade");
 
     function showNextAffirmation(initial = false) {
       const message = getNextAffirmation();
@@ -603,17 +653,46 @@
     });
 
     /* Ellipsis → Info / Upgrade Modal */
-    settingsIcon.addEventListener("click", () => {
+    
+    function openUpgrade() {
       document.body.classList.add("showing-upgrade");
       upgradeScreen.style.opacity = 1;
       upgradeScreen.style.pointerEvents = "all";
-    });
 
-    closeUpgrade.addEventListener("click", () => {
+      // reset scroll so the footer button is always reachable
+      const content = upgradeScreen.querySelector(".upgradeContent");
+      if (content) content.scrollTop = 0;
+    }
+
+    function closeUpgradeScreen() {
       document.body.classList.remove("showing-upgrade");
       upgradeScreen.style.opacity = 0;
       upgradeScreen.style.pointerEvents = "none";
+    }
+
+    settingsIcon.addEventListener("click", (e) => {
+      e.preventDefault();
+      openUpgrade();
     });
+
+    // Close via button (click + touch) for iOS reliability
+    ["click", "touchend"].forEach((evt) => {
+      closeUpgrade.addEventListener(evt, (e) => {
+        e.preventDefault();
+        closeUpgradeScreen();
+      }, { passive: false });
+    });
+
+    // Close when tapping outside the modal box
+    ["click", "touchend"].forEach((evt) => {
+      upgradeScreen.addEventListener(evt, (e) => {
+        if (e.target === upgradeScreen) {
+          e.preventDefault();
+          closeUpgradeScreen();
+        }
+      }, { passive: false });
+    });
+
   </script>
 </body>
 </html>
