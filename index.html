@@ -6,15 +6,30 @@
   <title>You</title>
 
   <style>
+    :root{
+      --bg-top: #c9b6e4;
+      --bg-bottom: #616b80;
+
+      /* iOS-friendly viewport height */
+      --app-height: 100vh;
+
+      /* handy safe area fallbacks */
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+
     body {
       margin: 0;
       padding: 0;
-      height: 100vh;
-      background: linear-gradient(to bottom, #c9b6e4, #616b80);
+      height: var(--app-height);
+      background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));
       font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
       color: white;
       overflow: hidden;
       position: relative;
+      -webkit-text-size-adjust: 100%;
     }
 
     /* ================================
@@ -24,7 +39,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      height: 100vh;
+      height: var(--app-height);
       width: 100vw;
       display: flex;
       flex-direction: column;
@@ -55,16 +70,14 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-
     /* ================================
        MAIN SCREEN
        ================================ */
-
     #main {
       position: absolute;
       top: 0;
       left: 0;
-      height: 100vh;
+      height: var(--app-height);
       width: 100vw;
       display: flex;
       justify-content: center;
@@ -76,13 +89,16 @@
 
     #settingsIcon {
       position: absolute;
-      top: 28px;
-      right: 28px;
+      top: calc(18px + var(--safe-top));
+      right: calc(18px + var(--safe-right));
       font-size: 26px;
       cursor: pointer;
       opacity: 0.85;
       user-select: none;
       transition: opacity 0.2s ease;
+      padding: 10px;
+      line-height: 1;
+      -webkit-tap-highlight-color: transparent;
     }
 
     #settingsIcon:hover {
@@ -122,6 +138,7 @@
       transition: transform 0.15s ease, box-shadow 0.15s ease;
       user-select: none;
       animation: softPulse 3s ease-in-out infinite;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .circle-button:active {
@@ -144,55 +161,76 @@
       text-align: center;
     }
 
-
     /* ================================
        INFO / UPGRADE SCREEN (MODAL)
        ================================ */
     #upgradeScreen {
       position: fixed;
-      top: 0;
-      left: 0;
-      height: calc(var(--vh, 1vh) * 100);
-      min-height: 100vh;
+      inset: 0;
+      height: var(--app-height);
       width: 100vw;
-      padding: 18px;
-      padding-top: calc(18px + env(safe-area-inset-top));
-      padding-bottom: calc(18px + env(safe-area-inset-bottom));
       background: rgba(0, 0, 0, 0.35);
       -webkit-backdrop-filter: blur(18px);
       backdrop-filter: blur(18px);
+
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
+
+      /* Slightly more breathing room at bottom so iPhone portrait looks better */
+      padding:
+        calc(18px + var(--safe-top))
+        calc(18px + var(--safe-right))
+        calc(28px + var(--safe-bottom))
+        calc(18px + var(--safe-left));
+
       z-index: 20;
       opacity: 0;
+      visibility: hidden;
       pointer-events: none;
-      transition: opacity 0.45s ease;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #upgradeScreen.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
     }
 
     .upgradeBox {
       background: rgba(255, 255, 255, 0.12);
-      padding: 32px 26px;
       border-radius: 22px;
       text-align: left;
-      width: 84%;
-      max-width: 380px;
+      width: min(84%, 420px);
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
       color: white;
 
-      max-height: calc((var(--vh, 1vh) * 100) - 80px);
-      overflow: hidden;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.22);
+
+      /* Prevent the footer from ending up on the extreme bottom edge */
+      max-height: calc(var(--app-height) - (88px + var(--safe-top) + var(--safe-bottom)));
     }
 
-    /* When upgrade is open, soften / hide the main layer */
-    body.showing-upgrade {
-      overflow: hidden;
-      touch-action: none;
+    .upgradeContent {
+      padding: 32px 26px 18px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .upgradeFooter {
+      /* Center the button perfectly */
+      display: flex;
+      justify-content: center;
+
+      padding: 12px 16px calc(14px + var(--safe-bottom));
+      background: rgba(0,0,0,0.10);
+      border-top: 1px solid rgba(255,255,255,0.12);
     }
 
     body.showing-upgrade #main {
@@ -265,18 +303,6 @@
       font-size: 14px;
     }
 
-    .closeUpgrade {
-      margin-top: 24px;
-      padding: 12px 20px;
-      background: rgba(255,255,255,0.85);
-      color: #616b80;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      user-select: none;
-      text-align: center;
-    }
-
     .noteSoon {
       font-size: 12px;
       opacity: 0.75;
@@ -284,31 +310,44 @@
       font-style: italic;
     }
 
-  
-    .upgradeContent{
-      flex: 1 1 auto;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-      padding-right: 4px;
-      overscroll-behavior: contain;
-    }
-
-    .upgradeFooter{
-      flex: 0 0 auto;
-      margin-top: 14px;
-      padding-top: 14px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom));
-      border-top: 1px solid rgba(255,255,255,0.20);
-    }
-
-    .closeUpgrade{
-      width: 100%;
-      display: block;
+    .closeUpgrade {
+      width: min(520px, 100%);
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.88);
+      color: #616b80;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      user-select: none;
+      text-align: center;
       border: none;
-      -webkit-appearance: none;
-      appearance: none;
-      touch-action: manipulation;
+      font-size: 16px;
+      line-height: 1.1;
       -webkit-tap-highlight-color: transparent;
+      display: block;
+    }
+
+    .closeUpgrade:active {
+      transform: scale(0.99);
+      background: rgba(255,255,255,0.82);
+    }
+
+    #upgradeScreen, .upgradeBox, .closeUpgrade {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Small nudge for iPhone portrait to keep the footer from hugging the bottom */
+    @media (max-width: 430px) and (orientation: portrait) {
+      #upgradeScreen {
+        padding-bottom: calc(36px + var(--safe-bottom));
+      }
+      .upgradeBox {
+        max-height: calc(var(--app-height) - (104px + var(--safe-top) + var(--safe-bottom)));
+      }
+      .upgradeFooter {
+        padding-bottom: calc(18px + var(--safe-bottom));
+      }
     }
   </style>
 </head>
@@ -323,8 +362,7 @@
 
   <!-- Main screen -->
   <div id="main">
-
-    <div id="settingsIcon">⋯</div>
+    <div id="settingsIcon" aria-label="Open info">⋯</div>
 
     <div id="affirmation"></div>
 
@@ -335,108 +373,101 @@
     <div id="microtext">take a moment</div>
   </div>
 
-
   <!-- Info / Upgrade Screen Modal -->
-  <div id="upgradeScreen">
-    <div class="upgradeBox">
+  <div id="upgradeScreen" aria-hidden="true" role="dialog" aria-label="Coming soon">
+    <div class="upgradeBox" role="document">
 
-      <div class="upgradeContent">
+      <div class="upgradeContent" id="upgradeContent">
+        <div class="sectionLabel">about you</div>
+        <div class="aboutText">
+          A quiet little space that gives you one kind thing to hold at a time. Tap, breathe, read, repeat.
+        </div>
 
-      <!-- about section -->
-      <div class="sectionLabel">about you</div>
-      <div class="aboutText">
-        A quiet little space that gives you one kind thing to hold at a time. Tap, breathe, read, repeat.
-      </div>
+        <div class="divider"></div>
 
-      <div class="divider"></div>
+        <div class="sectionLabel">you plus</div>
+        <div class="noteSoon">
+          You plus is not available yet. These are the things we are building toward.
+        </div>
+        <div class="upgradeTitle">deeper calm</div>
+        <div class="upgradeSubtitle">
+          When you are ready for more, you plus will let you shape how your calm feels and looks.
+        </div>
 
-      <!-- you plus section -->
-      <div class="sectionLabel">you plus</div>
-      <div class="noteSoon">
-        You plus is not available yet. These are the things we are building toward.
-      </div>
-      <div class="upgradeTitle">deeper calm</div>
-      <div class="upgradeSubtitle">
-        When you are ready for more, you plus will let you shape how your calm feels and looks.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> custom calming backgrounds<br>
+          Soft gradients, dark modes, and warm tones.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> custom calming backgrounds<br>
-        Soft gradients, dark modes, and warm tones.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> breathing animations<br>
+          Gentle inhale exhale motion styles.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> breathing animations<br>
-        Gentle inhale exhale motion styles.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> button styles<br>
+          Circle, pill, square, and more.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> button styles<br>
-        Circle, pill, square, and more.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> unlimited taps<br>
+          No limits. No restrictions.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> unlimited taps<br>
-        No limits. No restrictions.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> affirmation history<br>
+          Revisit your past moments of calm.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> affirmation history<br>
-        Revisit your past moments of calm.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> favorites<br>
+          Save the ones that hit your heart.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> favorites<br>
-        Save the ones that hit your heart.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> deeper affirmations<br>
+          Premium long form messages.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> deeper affirmations<br>
-        Premium long form messages.
-      </div>
+        <div class="divider"></div>
 
-      <div class="divider"></div>
+        <div class="comingHeader">what's next</div>
 
-      <!-- what's next section -->
-      <div class="comingHeader">what's next</div>
+        <div class="featureItem">
+          <span>✓</span> personalized AI support<br>
+          Affirmations based on your mood and day.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> personalized AI support<br>
-        Affirmations based on your mood and day.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> send to someone you know<br>
+          Text an affirmation straight from the app to a friend or loved one.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> send to someone you know<br>
-        Text an affirmation straight from the app to a friend or loved one.
-      </div>
+        <div class="featureItem">
+          <span>✓</span> you community messages<br>
+          Opt in to receive occasional affirmations from other you users, with gentle daily limits.
+        </div>
 
-      <div class="featureItem">
-        <span>✓</span> you community messages<br>
-        Opt in to receive occasional affirmations from other you users, with gentle daily limits.
-      </div>
-
-      <div class="featureItem">
-        <span>✓</span> charity giving option<br>
-        Choose to direct a portion of your plan to mental health charities.
-      </div>
-
+        <div class="featureItem">
+          <span>✓</span> charity giving option<br>
+          Choose to direct a portion of your plan to mental health charities.
+        </div>
       </div>
 
       <div class="upgradeFooter">
-        <button class="closeUpgrade" id="closeUpgrade" type="button">close</button>
+        <button type="button" class="closeUpgrade" id="closeUpgradeBtn">close</button>
       </div>
     </div>
   </div>
 
-
   <script>
-    /* Fix iOS viewport height issues (Safari/WKWebView) */
-    function setViewportUnit() {
-      document.documentElement.style.setProperty("--vh", (window.innerHeight * 0.01) + "px");
+    // iOS-friendly viewport height fix (prevents "half-visible" sticky button issues)
+    function setAppHeight() {
+      document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
     }
-    setViewportUnit();
-    window.addEventListener("resize", setViewportUnit);
-    window.addEventListener("orientationchange", setViewportUnit);
+    setAppHeight();
+    window.addEventListener('resize', setAppHeight);
+    window.addEventListener('orientationchange', () => setTimeout(setAppHeight, 250));
 
     /* Fade OUT launch screen */
     setTimeout(() => {
@@ -444,7 +475,7 @@
       launch.style.opacity = 0;
     }, 2000);
 
-    /* Remove launch + FADE IN main, then show first affirmation */
+    /* Remove launch + FADE IN main */
     setTimeout(() => {
       const launch = document.getElementById("launch");
       const main = document.getElementById("main");
@@ -452,11 +483,6 @@
       launch.style.display = "none";
       main.style.opacity = 1;
     }, 2000);
-
-
-    /* ================================
-       AFFIRMATIONS LIST
-       ================================ */
 
     const affirmations = [
       "You are allowed to rest without earning it first.",
@@ -565,10 +591,6 @@
       "You are allowed to trust that you are enough for this moment."
     ];
 
-    /* ================================
-       NON REPEATING LOGIC (QUEUE)
-       ================================ */
-
     const QUEUE_KEY = "youAffirmationQueue_v1";
 
     function shuffle(array) {
@@ -595,35 +617,26 @@
     function saveQueue(queue) {
       try {
         localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
-      } catch (e) {
-        // ignore storage errors
-      }
+      } catch (e) {}
     }
 
     function getNextAffirmation() {
       let queue = loadQueue();
-
-      // if queue empty, build a new shuffled cycle
       if (!queue || queue.length === 0) {
         queue = affirmations.map((_, index) => index);
         shuffle(queue);
       }
-
       const nextIndex = queue.shift();
       saveQueue(queue);
-
       return affirmations[nextIndex] || affirmations[0];
     }
-
-    /* ================================
-       DOM HOOKUP AND ANIMATION
-       ================================ */
 
     const affirmationBox = document.getElementById("affirmation");
     const tapButton = document.getElementById("tapButton");
     const settingsIcon = document.getElementById("settingsIcon");
     const upgradeScreen = document.getElementById("upgradeScreen");
-    const closeUpgrade = document.getElementById("closeUpgrade") || document.querySelector(".closeUpgrade");
+    const upgradeContent = document.getElementById("upgradeContent");
+    const closeUpgradeBtn = document.getElementById("closeUpgradeBtn");
 
     function showNextAffirmation(initial = false) {
       const message = getNextAffirmation();
@@ -648,51 +661,40 @@
       }, 250);
     }
 
-    tapButton.addEventListener("click", () => {
-      showNextAffirmation(false);
-    });
+    setTimeout(() => showNextAffirmation(true), 2100);
 
-    /* Ellipsis → Info / Upgrade Modal */
-    
+    tapButton.addEventListener("click", () => showNextAffirmation(false));
+
     function openUpgrade() {
       document.body.classList.add("showing-upgrade");
-      upgradeScreen.style.opacity = 1;
-      upgradeScreen.style.pointerEvents = "all";
-
-      // reset scroll so the footer button is always reachable
-      const content = upgradeScreen.querySelector(".upgradeContent");
-      if (content) content.scrollTop = 0;
+      upgradeScreen.classList.add("is-open");
+      upgradeScreen.setAttribute("aria-hidden", "false");
+      if (upgradeContent) upgradeContent.scrollTop = 0;
     }
 
-    function closeUpgradeScreen() {
+    function closeUpgrade() {
       document.body.classList.remove("showing-upgrade");
-      upgradeScreen.style.opacity = 0;
-      upgradeScreen.style.pointerEvents = "none";
+      upgradeScreen.classList.remove("is-open");
+      upgradeScreen.setAttribute("aria-hidden", "true");
     }
 
-    settingsIcon.addEventListener("click", (e) => {
+    settingsIcon.addEventListener("click", openUpgrade);
+
+    closeUpgradeBtn.addEventListener("click", closeUpgrade);
+    closeUpgradeBtn.addEventListener("touchend", (e) => {
       e.preventDefault();
-      openUpgrade();
+      closeUpgrade();
+    }, { passive: false });
+
+    upgradeScreen.addEventListener("click", (e) => {
+      if (e.target === upgradeScreen) closeUpgrade();
     });
 
-    // Close via button (click + touch) for iOS reliability
-    ["click", "touchend"].forEach((evt) => {
-      closeUpgrade.addEventListener(evt, (e) => {
-        e.preventDefault();
-        closeUpgradeScreen();
-      }, { passive: false });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && upgradeScreen.classList.contains("is-open")) {
+        closeUpgrade();
+      }
     });
-
-    // Close when tapping outside the modal box
-    ["click", "touchend"].forEach((evt) => {
-      upgradeScreen.addEventListener(evt, (e) => {
-        if (e.target === upgradeScreen) {
-          e.preventDefault();
-          closeUpgradeScreen();
-        }
-      }, { passive: false });
-    });
-
   </script>
 </body>
 </html>
