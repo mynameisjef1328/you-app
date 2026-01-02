@@ -10,7 +10,7 @@
       --bg-top: #c9b6e4;
       --bg-bottom: #616b80;
 
-      /* iOS-friendly viewport height */
+      /* iOS-friendly viewport height (set via JS) */
       --app-height: 100vh;
 
       /* handy safe area fallbacks */
@@ -18,6 +18,10 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-left: env(safe-area-inset-left, 0px);
       --safe-right: env(safe-area-inset-right, 0px);
+    }
+
+    html, body {
+      height: var(--app-height);
     }
 
     body {
@@ -177,11 +181,11 @@
       justify-content: center;
       align-items: center;
 
-      /* Slightly more breathing room at bottom so iPhone portrait looks better */
+      /* Symmetrical padding so the modal centers properly on iPhone portrait */
       padding:
         calc(18px + var(--safe-top))
         calc(18px + var(--safe-right))
-        calc(28px + var(--safe-bottom))
+        calc(18px + var(--safe-bottom))
         calc(18px + var(--safe-left));
 
       z-index: 20;
@@ -212,7 +216,7 @@
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.22);
 
-      /* Prevent the footer from ending up on the extreme bottom edge */
+      /* Keep footer usable, no hugging extremes */
       max-height: calc(var(--app-height) - (88px + var(--safe-top) + var(--safe-bottom)));
     }
 
@@ -224,10 +228,8 @@
     }
 
     .upgradeFooter {
-      /* Center the button perfectly */
       display: flex;
       justify-content: center;
-
       padding: 12px 16px calc(14px + var(--safe-bottom));
       background: rgba(0,0,0,0.10);
       border-top: 1px solid rgba(255,255,255,0.12);
@@ -337,13 +339,10 @@
       user-select: none;
     }
 
-    /* Small nudge for iPhone portrait to keep the footer from hugging the bottom */
+    /* iPhone portrait: keep sizing sensible, but do NOT push modal down */
     @media (max-width: 430px) and (orientation: portrait) {
-      #upgradeScreen {
-        padding-bottom: calc(36px + var(--safe-bottom));
-      }
       .upgradeBox {
-        max-height: calc(var(--app-height) - (104px + var(--safe-top) + var(--safe-bottom)));
+        max-height: calc(var(--app-height) - (96px + var(--safe-top) + var(--safe-bottom)));
       }
       .upgradeFooter {
         padding-bottom: calc(18px + var(--safe-bottom));
@@ -461,13 +460,20 @@
   </div>
 
   <script>
-    // iOS-friendly viewport height fix (prevents "half-visible" sticky button issues)
+    // iOS-friendly viewport height fix (uses visualViewport when available)
     function setAppHeight() {
-      document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+      const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      document.documentElement.style.setProperty("--app-height", h + "px");
     }
     setAppHeight();
-    window.addEventListener('resize', setAppHeight);
-    window.addEventListener('orientationchange', () => setTimeout(setAppHeight, 250));
+
+    window.addEventListener("resize", setAppHeight);
+    window.addEventListener("orientationchange", () => setTimeout(setAppHeight, 250));
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", setAppHeight);
+      window.visualViewport.addEventListener("scroll", setAppHeight);
+    }
 
     /* Fade OUT launch screen */
     setTimeout(() => {
