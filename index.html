@@ -674,9 +674,20 @@
       }, 250);
     }
 
-    setTimeout(() => showNextAffirmation(true), 2100);
+    /* FIX: Do NOT show an affirmation automatically on launch.
+       Only show the first affirmation after the first tap. */
+    let hasStarted = false;
 
-    tapButton.addEventListener("click", () => showNextAffirmation(false));
+    function handleTap() {
+      if (!hasStarted) {
+        hasStarted = true;
+        showNextAffirmation(true);
+      } else {
+        showNextAffirmation(false);
+      }
+    }
+
+    tapButton.addEventListener("click", handleTap);
 
     function openUpgrade() {
       document.body.classList.add("showing-upgrade");
