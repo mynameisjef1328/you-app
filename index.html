@@ -127,7 +127,7 @@
       right: calc(18px + var(--safe-right));
       width: 44px;
       height: 44px;
-      display: flex;
+      display: inline-flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
@@ -138,16 +138,12 @@
       border-radius: 12px;
       background: rgba(255,255,255,0.00);
       z-index: 5;
+      border: none;
+      color: inherit;
     }
 
     #menuIcon:hover { opacity: 1; }
     #menuIcon:active { transform: scale(0.98); }
-
-    /* Anchors used as buttons should not look like links */
-    #menuIcon, .sheetClose, .sheetBackdrop{
-      text-decoration: none;
-      color: inherit;
-    }
 
     #menuIcon svg {
       width: 22px;
@@ -270,19 +266,22 @@
       transition: opacity 0.25s ease, visibility 0.25s ease;
     }
 
+    /* Open state driven by JS class (more reliable than :target on iOS) */
+    #menuSheet.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
     .sheetBackdrop{
       position: absolute;
       inset: 0;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       z-index: 0;
-    }
-
-    /* IMPORTANT: this selector was never being reached before because of the extra } in your CSS */
-    #menuSheet:target {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
+      background: transparent;
+      border: none;
+      padding: 0;
     }
 
     .sheet {
@@ -305,7 +304,7 @@
       z-index: 1;
     }
 
-    #menuSheet:target .sheet {
+    #menuSheet.open .sheet {
       transform: translateY(0%);
     }
 
@@ -417,6 +416,7 @@
       border-radius: 14px;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.10);
+      cursor: pointer;
     }
 
     .row + .row { margin-top: 10px; }
@@ -569,13 +569,13 @@
 
   <!-- Main screen -->
   <div id="main">
-    <a id="menuIcon" href="#menuSheet" aria-label="Open menu" role="button" tabindex="0">
+    <button id="menuIcon" type="button" aria-label="Open menu">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M4 7h16"></path>
         <path d="M4 12h16"></path>
         <path d="M4 17h16"></path>
       </svg>
-    </a>
+    </button>
 
     <div id="affirmation"></div>
 
@@ -590,7 +590,7 @@
 
   <!-- Menu Sheet -->
   <div id="menuSheet" aria-hidden="true" role="dialog" aria-label="Menu">
-    <a class="sheetBackdrop" id="sheetBackdrop" href="#" aria-label="Close menu overlay"></a>
+    <button class="sheetBackdrop" id="sheetBackdrop" type="button" aria-label="Close menu overlay"></button>
 
     <div class="sheet">
       <div class="sheetCard" role="document">
@@ -598,7 +598,7 @@
 
         <div class="sheetTop">
           <div class="sheetTitle">You</div>
-          <a class="sheetClose" id="closeMenuBtn" href="#" role="button" tabindex="0">Close</a>
+          <button class="sheetClose" id="closeMenuBtn" type="button">Close</button>
         </div>
 
         <div class="sheetBody" id="sheetBody">
@@ -677,7 +677,6 @@
             <div class="featureItem"><span>✓</span>affirmation history</div>
             <div class="featureItem"><span>✓</span>favorites</div>
             <div class="featureItem"><span>✓</span>deeper affirmations</div>
-            <div class="divider"></div>
             <div class="featureItem"><span>✓</span>personalized AI support</div>
             <div class="featureItem"><span>✓</span>send to someone you know</div>
             <div class="featureItem"><span>✓</span>community messages</div>
@@ -901,68 +900,58 @@
     tapButton.addEventListener("click", handleTap);
 
     /* ================================
-       MENU SHEET LOGIC
+       MENU SHEET LOGIC (NO HASH)
        ================================ */
-    function openMenu() {
-      if (window.location.hash !== "#menuSheet") {
-        window.location.hash = "menuSheet";
-      }
-      syncSheetStateFromHash();
-      const closeBtn = document.getElementById("closeMenuBtn");
-      if (closeBtn) setTimeout(() => closeBtn.focus(), 0);
-    }
+    const menuSheet = document.getElementById("menuSheet");
+    const menuIconBtn = document.getElementById("menuIcon");
+    const closeMenuBtn = document.getElementById("closeMenuBtn");
+    const sheetBackdrop = document.getElementById("sheetBackdrop");
 
-    function closeMenu() {
-      if (window.location.hash) {
-        history.replaceState(null, document.title, window.location.pathname + window.location.search);
-      }
-      syncSheetStateFromHash();
-      const icon = document.getElementById("menuIcon");
-      if (icon) setTimeout(() => icon.focus(), 0);
-    }
+    let lastFocusedEl = null;
 
-    function syncSheetStateFromHash() {
-      const open = window.location.hash === "#menuSheet";
+    function syncSheet(open) {
       document.body.classList.toggle("showing-sheet", open);
-      const menuSheet = document.getElementById("menuSheet");
-      if (menuSheet) menuSheet.setAttribute("aria-hidden", open ? "false" : "true");
+
+      if (menuSheet) {
+        menuSheet.classList.toggle("open", open);
+        menuSheet.setAttribute("aria-hidden", open ? "false" : "true");
+      }
+
       if (open) {
         const body = document.getElementById("sheetBody");
         if (body) body.scrollTop = 0;
       }
     }
 
-    window.addEventListener("hashchange", syncSheetStateFromHash);
-    window.addEventListener("load", syncSheetStateFromHash);
-
-    // Make hamburger a reliable toggle, even if already on #menuSheet
-    const menuIcon = document.getElementById("menuIcon");
-    menuIcon.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (window.location.hash === "#menuSheet") closeMenu();
-      else openMenu();
-    });
-
-    // Close controls
-    const closeMenuBtn = document.getElementById("closeMenuBtn");
-    const sheetBackdrop = document.getElementById("sheetBackdrop");
-
-    if (closeMenuBtn) {
-      closeMenuBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        closeMenu();
-      });
+    function openMenu() {
+      if (!menuSheet) return;
+      lastFocusedEl = document.activeElement;
+      syncSheet(true);
+      if (closeMenuBtn) setTimeout(() => closeMenuBtn.focus(), 0);
     }
-    if (sheetBackdrop) {
-      sheetBackdrop.addEventListener("click", (e) => {
-        e.preventDefault();
-        closeMenu();
+
+    function closeMenu() {
+      syncSheet(false);
+      if (lastFocusedEl && typeof lastFocusedEl.focus === "function") {
+        setTimeout(() => lastFocusedEl.focus(), 0);
+      } else if (menuIconBtn) {
+        setTimeout(() => menuIconBtn.focus(), 0);
+      }
+    }
+
+    if (menuIconBtn) {
+      menuIconBtn.addEventListener("click", () => {
+        const isOpen = menuSheet && menuSheet.classList.contains("open");
+        if (isOpen) closeMenu();
+        else openMenu();
       });
     }
 
-    // Allow Escape to close the sheet
+    if (closeMenuBtn) closeMenuBtn.addEventListener("click", closeMenu);
+    if (sheetBackdrop) sheetBackdrop.addEventListener("click", closeMenu);
+
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && window.location.hash === "#menuSheet") {
+      if (e.key === "Escape" && menuSheet && menuSheet.classList.contains("open")) {
         closeMenu();
       }
     });
