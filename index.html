@@ -8,7 +8,7 @@
   <style>
     :root{
       /* Default theme (can be overridden by saved settings) */
-      --bg-top: #ac9b6e4;
+      --bg-top: #c9b6e4;
       --bg-bottom: #616b80;
 
       /* iOS-friendly viewport height (set via JS) */
@@ -116,16 +116,7 @@
     }
 
     /* Hamburger menu icon */
-    /* Visually hide the checkbox while keeping it toggleable via label */
-    #menuToggle{
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #menuIcon {
+#menuIcon {
       position: absolute;
       top: calc(18px + var(--safe-top));
       right: calc(18px + var(--safe-right));
@@ -146,7 +137,13 @@
     #menuIcon:hover { opacity: 1; }
     #menuIcon:active { transform: scale(0.98); }
 
-    #menuIcon svg {
+        /* Anchors used as buttons should not look like links */
+    #menuIcon, .sheetClose, .sheetBackdrop{
+      text-decoration: none;
+      color: inherit;
+    }
+
+#menuIcon svg {
       width: 22px;
       height: 22px;
       fill: none;
@@ -274,7 +271,7 @@
     }
     }
 
-    #menuToggle:checked ~ #menuSheet {
+    #menuSheet:target {
       opacity: 1;
       visibility: visible;
       pointer-events: auto;
@@ -299,7 +296,7 @@
       justify-content: center;
     }
 
-    #menuToggle:checked ~ #menuSheet .sheet {
+    #menuSheet:target .sheet {
       transform: translateY(0%);
     }
 
@@ -529,14 +526,14 @@
     }
 
     /* Blur main content when sheet is open */
-    #menuToggle:checked ~ #main {
+    body.showing-sheet #main {
       filter: blur(8px);
       transform: scale(1.01);
       transition: filter 0.25s ease, transform 0.25s ease;
     }
 
-    #menuToggle:checked ~ #main #tapButton,
-    #menuToggle:checked ~ #main #microtext {
+    body.showing-sheet #main #tapButton,
+    body.showing-sheet #main #microtext {
       opacity: 0;
       transition: opacity 0.2s ease;
     }
@@ -550,11 +547,7 @@
 </head>
 
 <body>
-
-  <!-- Menu toggle (CSS-driven open/close so it works even when JS is blocked) -->
-  <input type="checkbox" id="menuToggle" aria-hidden="true" />
-
-  <!-- Launch screen -->
+<!-- Launch screen -->
   <div id="launch">
     <div class="logo">you</div>
     <div class="tagline">just breathe</div>
@@ -562,13 +555,13 @@
 
   <!-- Main screen -->
   <div id="main">
-    <label id="menuIcon" for="menuToggle" aria-label="Open menu" role="button" tabindex="0">
+    <a id="menuIcon" href="#menuSheet" aria-label="Open menu" role="button" tabindex="0">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M4 7h16"></path>
         <path d="M4 12h16"></path>
         <path d="M4 17h16"></path>
       </svg>
-    </label>
+    </a>
 
     <div id="affirmation"></div>
 
@@ -583,14 +576,14 @@
 
   <!-- Menu Sheet -->
   <div id="menuSheet" aria-hidden="true" role="dialog" aria-label="Menu">
-    <label class="sheetBackdrop" for="menuToggle" aria-label="Close menu overlay"></label>
+    <a class="sheetBackdrop" href="#" aria-label="Close menu overlay"></a>
     <div class="sheet">
       <div class="sheetCard" role="document">
         <div class="grabberWrap"><div class="grabber"></div></div>
 
         <div class="sheetTop">
           <div class="sheetTitle">You</div>
-          <label class="sheetClose" id="closeMenuBtn" for="menuToggle" role="button" tabindex="0">Close</label>
+          <a class="sheetClose" id="closeMenuBtn" href="#" role="button" tabindex="0">Close</a>
         </div>
 
         <div class="sheetBody" id="sheetBody">
@@ -897,50 +890,30 @@
     /* ================================
        MENU SHEET LOGIC
        ================================ */
-    const menuToggle = document.getElementById("menuToggle");
-    const menuIcon = document.getElementById("menuIcon");
-    const menuSheet = document.getElementById("menuSheet");
-    const closeMenuBtn = document.getElementById("closeMenuBtn");
-
-    function openMenu() {
-      if (menuToggle) menuToggle.checked = true;
-      menuSheet.setAttribute("aria-hidden", "false");
-      const body = document.getElementById("sheetBody");
-      if (body) body.scrollTop = 0;
-    }
-
-    function closeMenu() {
-      if (menuToggle) menuToggle.checked = false;
-      menuSheet.setAttribute("aria-hidden", "true");
-    }
-
-    menuIcon.addEventListener("click", openMenu);
-    menuIcon.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") openMenu();
-    });
-
-    closeMenuBtn.addEventListener("click", closeMenu);
-
-
-    // Sync aria-hidden with checkbox state (helps accessibility when JS runs)
-    if (menuToggle) {
-      menuToggle.addEventListener("change", () => {
-        menuSheet.setAttribute("aria-hidden", menuToggle.checked ? "false" : "true");
-      });
-    }
-    menuSheet.addEventListener("click", (e) => {
-      if (e.target === menuSheet || (e.target && e.target.classList && e.target.classList.contains('sheetBackdrop'))) {
-        closeMenu();
+    // Uses URL hash (#menuSheet) so it works on GitHub Pages without any special browser support.
+    function syncSheetStateFromHash() {
+      const open = window.location.hash === "#menuSheet";
+      document.body.classList.toggle("showing-sheet", open);
+      const menuSheet = document.getElementById("menuSheet");
+      if (menuSheet) menuSheet.setAttribute("aria-hidden", open ? "false" : "true");
+      if (open) {
+        const body = document.getElementById("sheetBody");
+        if (body) body.scrollTop = 0;
       }
-    });
+    }
 
+    window.addEventListener("hashchange", syncSheetStateFromHash);
+    window.addEventListener("load", syncSheetStateFromHash);
+
+    // Allow Escape to close the sheet by clearing the hash
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && menuToggle && menuToggle.checked) {
-        closeMenu();
+      if (e.key === "Escape" && window.location.hash === "#menuSheet") {
+        history.pushState("", document.title, window.location.pathname + window.location.search);
+        syncSheetStateFromHash();
       }
     });
 
-    /* ================================
+/* ================================
        SAVED SETTINGS
        ================================ */
     const BG_KEY = "youBgTheme_v1";
