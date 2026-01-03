@@ -49,6 +49,11 @@
       -webkit-text-size-adjust: 100%;
     }
 
+    body.showing-sheet {
+      overflow: hidden;
+      touch-action: none;
+    }
+
     /* ================================
        LAUNCH SCREEN
        ================================ */
@@ -116,7 +121,7 @@
     }
 
     /* Hamburger menu icon */
-#menuIcon {
+    #menuIcon {
       position: absolute;
       top: calc(18px + var(--safe-top));
       right: calc(18px + var(--safe-right));
@@ -132,18 +137,19 @@
       -webkit-tap-highlight-color: transparent;
       border-radius: 12px;
       background: rgba(255,255,255,0.00);
+      z-index: 5;
     }
 
     #menuIcon:hover { opacity: 1; }
     #menuIcon:active { transform: scale(0.98); }
 
-        /* Anchors used as buttons should not look like links */
+    /* Anchors used as buttons should not look like links */
     #menuIcon, .sheetClose, .sheetBackdrop{
       text-decoration: none;
       color: inherit;
     }
 
-#menuIcon svg {
+    #menuIcon svg {
       width: 22px;
       height: 22px;
       fill: none;
@@ -252,6 +258,7 @@
       height: var(--app-height);
       width: 100%;
       z-index: 30;
+      display: block;
 
       background: rgba(0, 0, 0, 0.18);
       -webkit-backdrop-filter: blur(14px);
@@ -268,9 +275,10 @@
       inset: 0;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
-    }
+      z-index: 0;
     }
 
+    /* IMPORTANT: this selector was never being reached before because of the extra } in your CSS */
     #menuSheet:target {
       opacity: 1;
       visibility: visible;
@@ -294,6 +302,7 @@
 
       display: flex;
       justify-content: center;
+      z-index: 1;
     }
 
     #menuSheet:target .sheet {
@@ -310,6 +319,7 @@
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
       color: white;
+      position: relative;
     }
 
     .sheetTop {
@@ -330,6 +340,7 @@
       display: flex;
       justify-content: center;
       pointer-events: none;
+      z-index: 2;
     }
 
     .grabber {
@@ -354,6 +365,9 @@
       cursor: pointer;
       font-weight: 600;
       -webkit-tap-highlight-color: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .sheetClose:active {
@@ -547,7 +561,7 @@
 </head>
 
 <body>
-<!-- Launch screen -->
+  <!-- Launch screen -->
   <div id="launch">
     <div class="logo">you</div>
     <div class="tagline">just breathe</div>
@@ -576,7 +590,8 @@
 
   <!-- Menu Sheet -->
   <div id="menuSheet" aria-hidden="true" role="dialog" aria-label="Menu">
-    <a class="sheetBackdrop" href="#" aria-label="Close menu overlay"></a>
+    <a class="sheetBackdrop" id="sheetBackdrop" href="#" aria-label="Close menu overlay"></a>
+
     <div class="sheet">
       <div class="sheetCard" role="document">
         <div class="grabberWrap"><div class="grabber"></div></div>
@@ -695,8 +710,6 @@
       window.visualViewport.addEventListener("resize", setAppHeight);
       window.visualViewport.addEventListener("scroll", setAppHeight);
     }
-
-    // Launch/main transitions are CSS-driven so they still work in previews.
 
     const affirmations = [
       "You are allowed to rest without earning it first.",
@@ -890,7 +903,24 @@
     /* ================================
        MENU SHEET LOGIC
        ================================ */
-    // Uses URL hash (#menuSheet) so it works on GitHub Pages without any special browser support.
+    function openMenu() {
+      if (window.location.hash !== "#menuSheet") {
+        window.location.hash = "menuSheet";
+      }
+      syncSheetStateFromHash();
+      const closeBtn = document.getElementById("closeMenuBtn");
+      if (closeBtn) setTimeout(() => closeBtn.focus(), 0);
+    }
+
+    function closeMenu() {
+      if (window.location.hash) {
+        history.replaceState(null, document.title, window.location.pathname + window.location.search);
+      }
+      syncSheetStateFromHash();
+      const icon = document.getElementById("menuIcon");
+      if (icon) setTimeout(() => icon.focus(), 0);
+    }
+
     function syncSheetStateFromHash() {
       const open = window.location.hash === "#menuSheet";
       document.body.classList.toggle("showing-sheet", open);
@@ -905,15 +935,39 @@
     window.addEventListener("hashchange", syncSheetStateFromHash);
     window.addEventListener("load", syncSheetStateFromHash);
 
-    // Allow Escape to close the sheet by clearing the hash
+    // Make hamburger a reliable toggle, even if already on #menuSheet
+    const menuIcon = document.getElementById("menuIcon");
+    menuIcon.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (window.location.hash === "#menuSheet") closeMenu();
+      else openMenu();
+    });
+
+    // Close controls
+    const closeMenuBtn = document.getElementById("closeMenuBtn");
+    const sheetBackdrop = document.getElementById("sheetBackdrop");
+
+    if (closeMenuBtn) {
+      closeMenuBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeMenu();
+      });
+    }
+    if (sheetBackdrop) {
+      sheetBackdrop.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeMenu();
+      });
+    }
+
+    // Allow Escape to close the sheet
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && window.location.hash === "#menuSheet") {
-        history.pushState("", document.title, window.location.pathname + window.location.search);
-        syncSheetStateFromHash();
+        closeMenu();
       }
     });
 
-/* ================================
+    /* ================================
        SAVED SETTINGS
        ================================ */
     const BG_KEY = "youBgTheme_v1";
@@ -966,7 +1020,6 @@
     }
 
     function setBreathingStyle(style) {
-      // Update CSS variables based on style
       if (style === "steady") {
         document.documentElement.style.setProperty("--breath-duration", "3.6s");
         document.documentElement.style.setProperty("--breath-scale-min", "0.995");
@@ -980,7 +1033,6 @@
         document.documentElement.style.setProperty("--breath-shadow-min", "0.18");
         document.documentElement.style.setProperty("--breath-shadow-max", "0.30");
       } else {
-        // gentle
         document.documentElement.style.setProperty("--breath-duration", "4.8s");
         document.documentElement.style.setProperty("--breath-scale-min", "0.99");
         document.documentElement.style.setProperty("--breath-scale-max", "1.03");
@@ -995,13 +1047,11 @@
     }
 
     function initSavedSettings() {
-      // Background theme
       let savedTheme = "mist";
       try { savedTheme = localStorage.getItem(BG_KEY) || "mist"; } catch(e){}
       if (!THEMES[savedTheme]) savedTheme = "mist";
       setTheme(savedTheme);
 
-      // Breathing enabled
       let enabled = true;
       try {
         const stored = localStorage.getItem(BREATH_ENABLED_KEY);
@@ -1009,7 +1059,6 @@
       } catch(e){}
       setBreathingEnabled(enabled);
 
-      // Breathing style
       let style = "gentle";
       try { style = localStorage.getItem(BREATH_STYLE_KEY) || "gentle"; } catch(e){}
       if (!["gentle","steady","deep"].includes(style)) style = "gentle";
@@ -1021,7 +1070,6 @@
     /* ================================
        UI EVENTS FOR SETTINGS
        ================================ */
-    // Theme rows
     document.querySelectorAll("[data-theme]").forEach(row => {
       row.addEventListener("click", () => setTheme(row.getAttribute("data-theme")));
       row.addEventListener("keydown", (e) => {
@@ -1029,7 +1077,6 @@
       });
     });
 
-    // Breathing toggle
     const breathingToggle = document.getElementById("breathingToggle");
     breathingToggle.addEventListener("click", () => {
       const isOn = breathingToggle.classList.contains("on");
@@ -1042,7 +1089,6 @@
       }
     });
 
-    // Breathing style select
     const breathingStyleSelect = document.getElementById("breathingStyleSelect");
     breathingStyleSelect.addEventListener("change", (e) => {
       setBreathingStyle(e.target.value);
