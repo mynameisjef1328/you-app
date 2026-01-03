@@ -8,7 +8,7 @@
   <style>
     :root{
       /* Default theme (can be overridden by saved settings) */
-      --bg-top: #c9b6e4;
+      --bg-top: #ac9b6e4;
       --bg-bottom: #616b80;
 
       /* iOS-friendly viewport height (set via JS) */
@@ -116,6 +116,15 @@
     }
 
     /* Hamburger menu icon */
+    /* Visually hide the checkbox while keeping it toggleable via label */
+    #menuToggle{
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
     #menuIcon {
       position: absolute;
       top: calc(18px + var(--safe-top));
@@ -255,6 +264,7 @@
       visibility: hidden;
       pointer-events: none;
       transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
 
     .sheetBackdrop{
       position: absolute;
@@ -542,7 +552,7 @@
 <body>
 
   <!-- Menu toggle (CSS-driven open/close so it works even when JS is blocked) -->
-  <input type="checkbox" id="menuToggle" hidden aria-hidden="true" />
+  <input type="checkbox" id="menuToggle" aria-hidden="true" />
 
   <!-- Launch screen -->
   <div id="launch">
