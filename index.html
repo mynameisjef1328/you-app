@@ -22,11 +22,11 @@
       --safe-lr: max(var(--safe-left), var(--safe-right));
 
       /* Breathing defaults (can be overridden by saved settings) */
-      --breath-duration: 4.8s;
-      --breath-scale-min: 0.99;
-      --breath-scale-max: 1.03;
-      --breath-shadow-min: 0.20;
-      --breath-shadow-max: 0.28;
+      --breath-duration: 4.2s;
+      --breath-scale-min: 0.985;
+      --breath-scale-max: 1.055;
+      --breath-shadow-min: 0.18;
+      --breath-shadow-max: 0.38;
     }
 
     * { box-sizing: border-box; }
@@ -226,14 +226,14 @@
     }
 
     #tapHalo.on {
-      opacity: 1;
+      opacity: 0.16;
       animation: haloPulse var(--breath-duration) ease-in-out infinite;
     }
 
     @keyframes haloPulse {
-      0%   { transform: translate(-50%, -50%) scale(0.94); }
-      50%  { transform: translate(-50%, -50%) scale(1.08); }
-      100% { transform: translate(-50%, -50%) scale(0.94); }
+      0%   { transform: translate(-50%, -50%) scale(0.88); }
+      50%  { transform: translate(-50%, -50%) scale(1.18); }
+      100% { transform: translate(-50%, -50%) scale(0.88); }
     }
 
     #microtext {
@@ -1012,24 +1012,25 @@
 
     function setBreathingStyle(style) {
       if (style === "steady") {
-        document.documentElement.style.setProperty("--breath-duration", "3.6s");
-        document.documentElement.style.setProperty("--breath-scale-min", "0.995");
-        document.documentElement.style.setProperty("--breath-scale-max", "1.02");
-        document.documentElement.style.setProperty("--breath-shadow-min", "0.20");
-        document.documentElement.style.setProperty("--breath-shadow-max", "0.26");
-      } else if (style === "deep") {
-        document.documentElement.style.setProperty("--breath-duration", "6.4s");
-        document.documentElement.style.setProperty("--breath-scale-min", "0.985");
-        document.documentElement.style.setProperty("--breath-scale-max", "1.05");
-        document.documentElement.style.setProperty("--breath-shadow-min", "0.18");
-        document.documentElement.style.setProperty("--breath-shadow-max", "0.30");
-      } else {
-        document.documentElement.style.setProperty("--breath-duration", "4.8s");
-        document.documentElement.style.setProperty("--breath-scale-min", "0.99");
-        document.documentElement.style.setProperty("--breath-scale-max", "1.03");
-        document.documentElement.style.setProperty("--breath-shadow-min", "0.20");
-        document.documentElement.style.setProperty("--breath-shadow-max", "0.28");
-      }
+      document.documentElement.style.setProperty("--breath-duration", "3.2s");
+      document.documentElement.style.setProperty("--breath-scale-min", "0.99");
+      document.documentElement.style.setProperty("--breath-scale-max", "1.05");
+      document.documentElement.style.setProperty("--breath-shadow-min", "0.18");
+      document.documentElement.style.setProperty("--breath-shadow-max", "0.34");
+    } else if (style === "deep") {
+      document.documentElement.style.setProperty("--breath-duration", "5.8s");
+      document.documentElement.style.setProperty("--breath-scale-min", "0.975");
+      document.documentElement.style.setProperty("--breath-scale-max", "1.07");
+      document.documentElement.style.setProperty("--breath-shadow-min", "0.16");
+      document.documentElement.style.setProperty("--breath-shadow-max", "0.42");
+    } else {
+      // gentle
+      document.documentElement.style.setProperty("--breath-duration", "4.2s");
+      document.documentElement.style.setProperty("--breath-scale-min", "0.985");
+      document.documentElement.style.setProperty("--breath-scale-max", "1.055");
+      document.documentElement.style.setProperty("--breath-shadow-min", "0.18");
+      document.documentElement.style.setProperty("--breath-shadow-max", "0.38");
+    }
 
       const select = document.getElementById("breathingStyleSelect");
       if (select) select.value = style;
