@@ -576,6 +576,124 @@
       stroke-linejoin: round;
     }
 
+    .plusBox {
+      padding: 18px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      line-height: 1.45;
+    }
+
+    .plusHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .plusTitle {
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .plusBadge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(52, 199, 89, 0.20);
+      color: rgba(52, 199, 89, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .plusPrice {
+      font-size: 24px;
+      font-weight: 700;
+      opacity: 0.95;
+    }
+
+    .plusSubprice {
+      font-size: 12px;
+      opacity: 0.70;
+      margin-top: 2px;
+    }
+
+    .plusDescription {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .purchaseBtn {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, rgba(52, 199, 89, 0.85), rgba(48, 176, 199, 0.85));
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(52, 199, 89, 0.25);
+      margin-top: 14px;
+    }
+
+    .purchaseBtn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(52, 199, 89, 0.35);
+    }
+
+    .purchaseBtn:active {
+      transform: scale(0.99);
+    }
+
+    .purchaseBtn svg {
+      width: 18px;
+      height: 18px;
+      stroke: white;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .ownedBadge {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(52, 199, 89, 0.12);
+      border: 1px solid rgba(52, 199, 89, 0.30);
+      color: rgba(52, 199, 89, 1);
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .ownedBadge svg {
+      width: 18px;
+      height: 18px;
+      stroke: rgba(52, 199, 89, 1);
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     .comingSoonTitle {
       font-size: 18px;
       font-weight: 700;
@@ -726,10 +844,22 @@
 
           <div class="divider"></div>
 
-          <div class="sectionLabel">Coming soon</div>
-          <div class="comingSoonBox">
-            <div class="comingSoonTitle">You Plus</div>
-            <div class="comingSoonNote">Not available yet. These are the things we are building toward.</div>
+          <div class="sectionLabel">You Plus</div>
+          <div class="plusBox" id="plusBox">
+            <div class="plusHeader">
+              <div class="plusTitle">
+                You Plus
+                <span class="plusBadge">One-time</span>
+              </div>
+              <div style="text-align: right;">
+                <div class="plusPrice">$4.99</div>
+                <div class="plusSubprice">forever</div>
+              </div>
+            </div>
+
+            <div class="plusDescription">
+              Unlock everything. No subscriptions, no recurring charges. Just more calm, more features, more you.
+            </div>
 
             <div class="featureItem"><span>✓</span>more custom calming backgrounds</div>
             <div class="featureItem"><span>✓</span>more breathing styles</div>
@@ -742,6 +872,14 @@
             <div class="featureItem"><span>✓</span>send to someone you know</div>
             <div class="featureItem"><span>✓</span>community messages</div>
             <div class="featureItem"><span>✓</span>charity giving option</div>
+
+            <button class="purchaseBtn" id="purchaseBtn" type="button" data-event="purchase_click">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+              </svg>
+              Get You Plus
+            </button>
           </div>
 
           <div class="divider"></div>
@@ -1265,6 +1403,162 @@
         );
       });
     }
+
+    /* ================================
+       YOU PLUS PURCHASE SYSTEM
+       ================================ */
+    const PLUS_KEY = "youPlusPurchased_v1";
+
+    function isPlusUser() {
+      try {
+        return localStorage.getItem(PLUS_KEY) === "true";
+      } catch(e) {
+        return false;
+      }
+    }
+
+    function setPlusUser(purchased) {
+      try {
+        localStorage.setItem(PLUS_KEY, String(purchased));
+        updatePlusUI();
+        trackEvent("plus_status_changed", { purchased });
+      } catch(e) {}
+    }
+
+    function updatePlusUI() {
+      const plusBox = document.getElementById("plusBox");
+      const purchaseBtn = document.getElementById("purchaseBtn");
+
+      if (!plusBox || !purchaseBtn) return;
+
+      if (isPlusUser()) {
+        // User has purchased - show "owned" state
+        purchaseBtn.style.display = "none";
+
+        const ownedBadge = document.createElement("div");
+        ownedBadge.className = "ownedBadge";
+        ownedBadge.innerHTML = `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          You Plus Active
+        `;
+
+        // Only add if not already there
+        if (!plusBox.querySelector(".ownedBadge")) {
+          plusBox.appendChild(ownedBadge);
+        }
+      } else {
+        // User hasn't purchased - show purchase button
+        purchaseBtn.style.display = "flex";
+        const existingBadge = plusBox.querySelector(".ownedBadge");
+        if (existingBadge) existingBadge.remove();
+      }
+    }
+
+    // Initialize Plus UI on load
+    updatePlusUI();
+
+    /* ================================
+       PAYMENT INTEGRATION
+       ================================ */
+    const purchaseBtn = document.getElementById("purchaseBtn");
+
+    if (purchaseBtn) {
+      purchaseBtn.addEventListener("click", async () => {
+        trackEvent("purchase_initiated");
+
+        // INTEGRATION POINT: Replace this with your actual payment provider
+        //
+        // Example Stripe integration:
+        // const stripe = Stripe('your_publishable_key');
+        // const { error } = await stripe.redirectToCheckout({
+        //   lineItems: [{ price: 'price_xxxxx', quantity: 1 }],
+        //   mode: 'payment',
+        //   successUrl: window.location.href + '?purchase=success',
+        //   cancelUrl: window.location.href + '?purchase=cancelled',
+        // });
+        //
+        // Example LemonSqueezy:
+        // window.createLemonSqueezy();
+        // window.LemonSqueezy.Url.Open('your_checkout_url');
+        //
+        // Example Gumroad:
+        // window.open('https://yourname.gumroad.com/l/youplus', '_blank');
+        //
+        // Example Paddle:
+        // Paddle.Checkout.open({
+        //   product: 12345,
+        //   successCallback: function() { handlePurchaseSuccess(); }
+        // });
+
+        // FOR DEMO: Show alert with instructions
+        const confirmed = confirm(
+          "Payment Integration Required\n\n" +
+          "To enable purchases, integrate your preferred payment provider:\n\n" +
+          "• Stripe (recommended for global)\n" +
+          "• LemonSqueezy (easiest setup)\n" +
+          "• Gumroad (creator-friendly)\n" +
+          "• Paddle (includes tax handling)\n\n" +
+          "Check the JavaScript comments for integration examples.\n\n" +
+          "Press OK to simulate a successful purchase (demo only)"
+        );
+
+        if (confirmed) {
+          handlePurchaseSuccess();
+        }
+      });
+    }
+
+    function handlePurchaseSuccess() {
+      setPlusUser(true);
+      trackEvent("purchase_completed");
+
+      // Show success message
+      alert("Welcome to You Plus! ✨\n\nAll premium features are now unlocked.");
+
+      // Close menu after purchase
+      setTimeout(() => {
+        closeMenu();
+      }, 500);
+    }
+
+    // Check URL for purchase success (useful for Stripe redirects)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('purchase') === 'success') {
+      handlePurchaseSuccess();
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // FEATURE GATING HELPER
+    // Use this function to check if user has access to premium features
+    function requiresPlus(featureName) {
+      if (!isPlusUser()) {
+        trackEvent("plus_feature_attempted", { feature: featureName });
+        const upgrade = confirm(
+          "This feature requires You Plus.\n\n" +
+          "Upgrade once for $4.99 to unlock everything forever.\n\n" +
+          "Press OK to see upgrade options."
+        );
+        if (upgrade) {
+          openMenu();
+          // Scroll to Plus section
+          setTimeout(() => {
+            const plusBox = document.getElementById("plusBox");
+            if (plusBox) plusBox.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 350);
+        }
+        return false;
+      }
+      return true;
+    }
+
+    // Example usage of feature gating:
+    // if (requiresPlus("affirmation_history")) {
+    //   // Show affirmation history
+    // }
   </script>
 </body>
 </html>
