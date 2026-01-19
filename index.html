@@ -3,7 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>You</title>
+  <title>You - Just Breathe</title>
+
+  <!-- SEO -->
+  <meta name="description" content="A quiet little space that gives you one kind thing to hold at a time. Tap, breathe, read, repeat." />
+  <meta name="keywords" content="affirmations, mindfulness, breathing, meditation, wellness, mental health, self-care" />
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="You - Just Breathe" />
+  <meta property="og:description" content="A quiet little space that gives you one kind thing to hold at a time." />
+  <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23c9b6e4'/%3E%3Cstop offset='100%25' style='stop-color:%23616b80'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='630' fill='url(%23bg)'/%3E%3Ctext x='600' y='315' font-family='system-ui' font-size='120' font-weight='600' fill='white' text-anchor='middle' dominant-baseline='middle'%3Eyou%3C/text%3E%3Ctext x='600' y='420' font-family='system-ui' font-size='36' fill='white' opacity='0.9' text-anchor='middle'%3Ejust breathe%3C/text%3E%3C/svg%3E" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="You - Just Breathe" />
+  <meta name="twitter:description" content="A quiet little space that gives you one kind thing to hold at a time." />
+
+  <!-- PWA -->
+  <meta name="theme-color" content="#616b80" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="You" />
+  <link rel="manifest" href="/manifest.json" />
 
   <style>
     :root{
@@ -517,6 +539,43 @@
       line-height: 1.45;
     }
 
+    .shareBtn {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease;
+    }
+
+    .shareBtn:hover {
+      background: rgba(255,255,255,0.12);
+    }
+
+    .shareBtn:active {
+      transform: scale(0.99);
+      background: rgba(255,255,255,0.10);
+    }
+
+    .shareBtn svg {
+      width: 18px;
+      height: 18px;
+      stroke: white;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     .comingSoonTitle {
       font-size: 18px;
       font-weight: 700;
@@ -583,7 +642,7 @@
 
     <div id="tapHalo"></div>
 
-    <div class="circle-button breathing-on" id="tapButton">
+    <div class="circle-button breathing-on" id="tapButton" data-event="tap_button">
       tap me
     </div>
 
@@ -606,7 +665,7 @@
         <div class="sheetBody" id="sheetBody">
           <div class="sectionLabel">Backgrounds</div>
 
-          <div class="row" data-theme="mist" role="button" tabindex="0" aria-label="Select Mist background">
+          <div class="row" data-theme="mist" data-event="theme_select" data-theme-name="mist" role="button" tabindex="0" aria-label="Select Mist background">
             <div class="rowLeft">
               <div class="swatch" style="background: linear-gradient(to bottom, #c9b6e4, #616b80)"></div>
               <div>
@@ -617,7 +676,7 @@
             <div class="check" data-theme-check="mist" aria-hidden="true"></div>
           </div>
 
-          <div class="row" data-theme="dusk" role="button" tabindex="0" aria-label="Select Dusk background">
+          <div class="row" data-theme="dusk" data-event="theme_select" data-theme-name="dusk" role="button" tabindex="0" aria-label="Select Dusk background">
             <div class="rowLeft">
               <div class="swatch" style="background: linear-gradient(to bottom, #b8a7de, #3a3f55)"></div>
               <div>
@@ -628,7 +687,7 @@
             <div class="check" data-theme-check="dusk" aria-hidden="true"></div>
           </div>
 
-          <div class="row" data-theme="ember" role="button" tabindex="0" aria-label="Select Ember background">
+          <div class="row" data-theme="ember" data-event="theme_select" data-theme-name="ember" role="button" tabindex="0" aria-label="Select Ember background">
             <div class="rowLeft">
               <div class="swatch" style="background: linear-gradient(to bottom, #252535, #664333)"></div>
               <div>
@@ -651,13 +710,13 @@
               </div>
             </div>
 
-            <div class="toggle on" id="breathingToggle" role="switch" aria-checked="true" tabindex="0">
+            <div class="toggle on" id="breathingToggle" data-event="breathing_toggle" role="switch" aria-checked="true" tabindex="0">
               <div class="toggleKnob"></div>
             </div>
           </div>
 
           <div class="selectWrap">
-            <select id="breathingStyleSelect" aria-label="Breathing style">
+            <select id="breathingStyleSelect" data-event="breathing_style_change" aria-label="Breathing style">
               <option value="gentle">Gentle</option>
               <option value="steady">Steady</option>
               <option value="deep">Deep</option>
@@ -684,6 +743,20 @@
             <div class="featureItem"><span>✓</span>community messages</div>
             <div class="featureItem"><span>✓</span>charity giving option</div>
           </div>
+
+          <div class="divider"></div>
+
+          <div class="sectionLabel">Share</div>
+          <button class="shareBtn" id="shareBtn" type="button" data-event="share_click">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            Share this moment
+          </button>
 
           <div class="divider"></div>
 
@@ -1085,6 +1158,113 @@
     breathingStyleSelect.addEventListener("change", (e) => {
       setBreathingStyle(e.target.value);
     });
+
+    /* ================================
+       ANALYTICS HELPER
+       ================================ */
+    function trackEvent(eventName, data = {}) {
+      // Console log for now - easy to wire to GA, Plausible, etc.
+      console.log(`[Analytics] ${eventName}`, data);
+
+      // Example integration points:
+      // if (window.gtag) gtag('event', eventName, data);
+      // if (window.plausible) plausible(eventName, { props: data });
+    }
+
+    // Auto-track all elements with data-event attribute
+    document.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-event]");
+      if (target) {
+        const eventName = target.getAttribute("data-event");
+        const eventData = {};
+
+        // Collect all data-* attributes for context
+        Array.from(target.attributes).forEach(attr => {
+          if (attr.name.startsWith("data-") && attr.name !== "data-event") {
+            eventData[attr.name.replace("data-", "")] = attr.value;
+          }
+        });
+
+        trackEvent(eventName, eventData);
+      }
+    });
+
+    /* ================================
+       KEYBOARD SHORTCUTS
+       ================================ */
+    document.addEventListener("keydown", (e) => {
+      // Spacebar to tap (only when not in menu)
+      if (e.code === "Space" && !menuSheet.classList.contains("open")) {
+        e.preventDefault();
+        handleTap();
+        tapButton.style.transform = "scale(0.96)";
+        setTimeout(() => {
+          tapButton.style.transform = "";
+        }, 150);
+      }
+    });
+
+    /* ================================
+       SHARE FUNCTIONALITY
+       ================================ */
+    const shareBtn = document.getElementById("shareBtn");
+    if (shareBtn && navigator.share) {
+      shareBtn.addEventListener("click", async () => {
+        try {
+          const currentAffirmation = affirmationBox.textContent || "Just breathe";
+          await navigator.share({
+            title: "You - Just Breathe",
+            text: currentAffirmation,
+            url: window.location.href
+          });
+          trackEvent("share_success", { affirmation: currentAffirmation });
+        } catch (err) {
+          if (err.name !== "AbortError") {
+            console.log("Share failed:", err);
+            trackEvent("share_failed", { error: err.message });
+          }
+        }
+      });
+    } else if (shareBtn) {
+      // Fallback for browsers without Web Share API
+      shareBtn.addEventListener("click", () => {
+        const currentAffirmation = affirmationBox.textContent || "Just breathe";
+        const text = `${currentAffirmation}\n\n${window.location.href}`;
+        navigator.clipboard.writeText(text).then(() => {
+          shareBtn.textContent = "Copied!";
+          setTimeout(() => {
+            shareBtn.innerHTML = `
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+              Share this moment
+            `;
+          }, 2000);
+          trackEvent("share_copied");
+        });
+      });
+    }
+
+    /* ================================
+       PWA SERVICE WORKER
+       ================================ */
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").then(
+          (registration) => {
+            console.log("ServiceWorker registered:", registration.scope);
+            trackEvent("pwa_sw_registered");
+          },
+          (err) => {
+            console.log("ServiceWorker registration failed:", err);
+          }
+        );
+      });
+    }
   </script>
 </body>
 </html>
