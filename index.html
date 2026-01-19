@@ -861,6 +861,10 @@
               Unlock everything. No subscriptions, no recurring charges. Just more calm, more features, more you.
             </div>
 
+            <div class="plusDescription" style="margin-top: 8px; opacity: 0.75; font-size: 13px; border-left: 2px solid rgba(52, 199, 89, 0.4); padding-left: 12px;">
+              10% of every purchase supports mental health charities helping people who need it most.
+            </div>
+
             <div class="featureItem"><span>✓</span>more custom calming backgrounds</div>
             <div class="featureItem"><span>✓</span>more breathing styles</div>
             <div class="featureItem"><span>✓</span>more button styles</div>
@@ -1461,53 +1465,52 @@
     updatePlusUI();
 
     /* ================================
-       PAYMENT INTEGRATION
+       PAYMENT INTEGRATION - STRIPE PAYMENT LINKS
        ================================ */
     const purchaseBtn = document.getElementById("purchaseBtn");
+
+    // STRIPE PAYMENT LINK SETUP INSTRUCTIONS:
+    //
+    // 1. Go to https://dashboard.stripe.com/payment-links
+    // 2. Click "New payment link"
+    // 3. Set up your product:
+    //    - Name: "You Plus"
+    //    - Price: $4.99 USD (one-time)
+    //    - Description: "Unlock all premium features"
+    // 4. Set success URL to: https://yourdomain.com?purchase=success
+    // 5. Copy the payment link (looks like: https://buy.stripe.com/xxxxx)
+    // 6. Paste it in the STRIPE_PAYMENT_LINK constant below
+    //
+    // That's it! Apple Pay, Google Pay, and credit cards work automatically.
+
+    const STRIPE_PAYMENT_LINK = ""; // Paste your Stripe Payment Link here
 
     if (purchaseBtn) {
       purchaseBtn.addEventListener("click", async () => {
         trackEvent("purchase_initiated");
 
-        // INTEGRATION POINT: Replace this with your actual payment provider
-        //
-        // Example Stripe integration:
-        // const stripe = Stripe('your_publishable_key');
-        // const { error } = await stripe.redirectToCheckout({
-        //   lineItems: [{ price: 'price_xxxxx', quantity: 1 }],
-        //   mode: 'payment',
-        //   successUrl: window.location.href + '?purchase=success',
-        //   cancelUrl: window.location.href + '?purchase=cancelled',
-        // });
-        //
-        // Example LemonSqueezy:
-        // window.createLemonSqueezy();
-        // window.LemonSqueezy.Url.Open('your_checkout_url');
-        //
-        // Example Gumroad:
-        // window.open('https://yourname.gumroad.com/l/youplus', '_blank');
-        //
-        // Example Paddle:
-        // Paddle.Checkout.open({
-        //   product: 12345,
-        //   successCallback: function() { handlePurchaseSuccess(); }
-        // });
+        // Check if Stripe Payment Link is configured
+        if (!STRIPE_PAYMENT_LINK || STRIPE_PAYMENT_LINK === "") {
+          // DEMO MODE - Remove this after adding your Stripe link
+          const confirmed = confirm(
+            "Demo Mode\n\n" +
+            "Payment integration is ready! To enable real purchases:\n\n" +
+            "1. Create a Stripe Payment Link (free account)\n" +
+            "2. Paste it in the code (see comments at line ~1440)\n" +
+            "3. That's it - Apple Pay & credit cards work automatically\n\n" +
+            "Press OK to simulate a successful purchase."
+          );
 
-        // FOR DEMO: Show alert with instructions
-        const confirmed = confirm(
-          "Payment Integration Required\n\n" +
-          "To enable purchases, integrate your preferred payment provider:\n\n" +
-          "• Stripe (recommended for global)\n" +
-          "• LemonSqueezy (easiest setup)\n" +
-          "• Gumroad (creator-friendly)\n" +
-          "• Paddle (includes tax handling)\n\n" +
-          "Check the JavaScript comments for integration examples.\n\n" +
-          "Press OK to simulate a successful purchase (demo only)"
-        );
-
-        if (confirmed) {
-          handlePurchaseSuccess();
+          if (confirmed) {
+            handlePurchaseSuccess();
+          }
+          return;
         }
+
+        // PRODUCTION MODE - Redirect to Stripe Payment Link
+        // Includes Apple Pay, Google Pay, and all credit cards automatically
+        // Stripe handles the entire checkout experience
+        window.location.href = STRIPE_PAYMENT_LINK;
       });
     }
 
