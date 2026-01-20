@@ -1881,14 +1881,32 @@
 
     function initAudioContext() {
       if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        gainNode = audioContext.createGain();
-        gainNode.connect(audioContext.destination);
+        try {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          gainNode = audioContext.createGain();
+          gainNode.connect(audioContext.destination);
+          console.log('[Sounds] AudioContext created, state:', audioContext.state);
+        } catch(e) {
+          console.error('[Sounds] Failed to create AudioContext:', e);
+          alert('Audio not supported in this browser. Try Chrome, Safari, or Firefox.');
+          return false;
+        }
       }
-      // Resume if suspended (needed for some browsers)
+
+      // Resume if suspended (needed for browser autoplay restrictions)
       if (audioContext.state === 'suspended') {
-        audioContext.resume();
+        console.log('[Sounds] AudioContext suspended, attempting to resume...');
+        return audioContext.resume().then(() => {
+          console.log('[Sounds] AudioContext resumed, state:', audioContext.state);
+          return true;
+        }).catch(e => {
+          console.error('[Sounds] Failed to resume AudioContext:', e);
+          return false;
+        });
       }
+
+      console.log('[Sounds] AudioContext ready, state:', audioContext.state);
+      return Promise.resolve(true);
     }
 
     function stopAllSounds() {
@@ -1896,34 +1914,47 @@
         try {
           if (node.stop) node.stop();
           if (node.disconnect) node.disconnect();
-        } catch(e) {}
+        } catch(e) {
+          console.error('[Sounds] Error stopping sound:', e);
+        }
       });
       currentSoundNodes = [];
+      console.log('[Sounds] All sounds stopped');
     }
 
-    function generateWhiteNoise() {
-      initAudioContext();
-      stopAllSounds();
-
-      const bufferSize = 2 * audioContext.sampleRate;
-      const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
+    async function generateWhiteNoise() {
+      const ready = await await initAudioContext();
+      if (!ready) {
+        console.error('[Sounds] AudioContext not ready');
+        return;
       }
 
-      const whiteNoise = audioContext.createBufferSource();
-      whiteNoise.buffer = noiseBuffer;
-      whiteNoise.loop = true;
-      whiteNoise.connect(gainNode);
-      whiteNoise.start(0);
+      stopAllSounds();
 
-      currentSoundNodes.push(whiteNoise);
+      try {
+        const bufferSize = 2 * audioContext.sampleRate;
+        const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+
+        const whiteNoise = audioContext.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.loop = true;
+        whiteNoise.connect(gainNode);
+        whiteNoise.start(0);
+
+        currentSoundNodes.push(whiteNoise);
+        console.log('[Sounds] White noise started, nodes:', currentSoundNodes.length);
+      } catch(e) {
+        console.error('[Sounds] Error generating white noise:', e);
+      }
     }
 
-    function generatePinkNoise() {
-      initAudioContext();
+    async function generatePinkNoise() {
+      await await initAudioContext();
       stopAllSounds();
 
       const bufferSize = 2 * audioContext.sampleRate;
@@ -1953,8 +1984,8 @@
       currentSoundNodes.push(pinkNoise);
     }
 
-    function generateBrownNoise() {
-      initAudioContext();
+    async function generateBrownNoise() {
+      await initAudioContext();
       stopAllSounds();
 
       const bufferSize = 2 * audioContext.sampleRate;
@@ -1978,8 +2009,8 @@
       currentSoundNodes.push(brownNoise);
     }
 
-    function generateRain() {
-      initAudioContext();
+    async function generateRain() {
+      await initAudioContext();
       stopAllSounds();
 
       // Rain = Pink noise + filtered white noise bursts
@@ -2012,8 +2043,8 @@
       currentSoundNodes.push(rain, filter);
     }
 
-    function generateOcean() {
-      initAudioContext();
+    async function generateOcean() {
+      await initAudioContext();
       stopAllSounds();
 
       // Ocean = Low-frequency oscillating brown noise
@@ -2045,8 +2076,8 @@
       currentSoundNodes.push(ocean, filter);
     }
 
-    function generateForest() {
-      initAudioContext();
+    async function generateForest() {
+      await initAudioContext();
       stopAllSounds();
 
       // Forest = Pink noise with high-frequency emphasis (birds/leaves)
@@ -2079,8 +2110,8 @@
       currentSoundNodes.push(forest, filter);
     }
 
-    function generateFireplace() {
-      initAudioContext();
+    async function generateFireplace() {
+      await initAudioContext();
       stopAllSounds();
 
       // Fireplace = Crackling brown noise
@@ -2112,7 +2143,7 @@
       currentSoundNodes.push(fireplace, filter);
     }
 
-    function playSoundType(type) {
+    async function playSoundType(type) {
       const premiumSounds = ["rain", "ocean", "forest", "fireplace"];
 
       console.log('[Sounds] Playing sound type:', type);
@@ -2138,31 +2169,31 @@
       switch(type) {
         case "whitenoise":
           console.log('[Sounds] Generating white noise');
-          generateWhiteNoise();
+          await generateWhiteNoise();
           break;
         case "pinknoise":
           console.log('[Sounds] Generating pink noise');
-          generatePinkNoise();
+          await generatePinkNoise();
           break;
         case "brownnoise":
           console.log('[Sounds] Generating brown noise');
-          generateBrownNoise();
+          await generateBrownNoise();
           break;
         case "rain":
           console.log('[Sounds] Generating rain');
-          generateRain();
+          await generateRain();
           break;
         case "ocean":
           console.log('[Sounds] Generating ocean');
-          generateOcean();
+          await generateOcean();
           break;
         case "forest":
           console.log('[Sounds] Generating forest');
-          generateForest();
+          await generateForest();
           break;
         case "fireplace":
           console.log('[Sounds] Generating fireplace');
-          generateFireplace();
+          await generateFireplace();
           break;
         default:
           console.log('[Sounds] Stopping all sounds (none selected)');
