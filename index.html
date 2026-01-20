@@ -1112,7 +1112,6 @@
 
           <div class="selectWrap">
             <select id="soundTypeSelect" data-event="sound_type_change" aria-label="Sound type">
-              <option value="none">None</option>
               <option value="whitenoise">White Noise</option>
               <option value="pinknoise">Pink Noise</option>
               <option value="brownnoise">Brown Noise</option>
@@ -1120,6 +1119,7 @@
               <option value="ocean" data-premium="true">Ocean Waves (Plus) 🔒</option>
               <option value="forest" data-premium="true">Forest (Plus) 🔒</option>
               <option value="fireplace" data-premium="true">Fireplace (Plus) 🔒</option>
+              <option value="none">Off</option>
             </select>
             <div class="helperText">Choose a sound that soothes you.</div>
           </div>
@@ -2115,6 +2115,8 @@
     function playSoundType(type) {
       const premiumSounds = ["rain", "ocean", "forest", "fireplace"];
 
+      console.log('[Sounds] Playing sound type:', type);
+
       // Check if sound is premium
       if (premiumSounds.includes(type) && !isPlusUser()) {
         requiresPlus("premium_sounds");
@@ -2122,10 +2124,10 @@
         const select = document.getElementById("soundTypeSelect");
         if (select) {
           try {
-            const lastType = localStorage.getItem(SOUND_TYPE_KEY) || "none";
+            const lastType = localStorage.getItem(SOUND_TYPE_KEY) || "whitenoise";
             select.value = lastType;
           } catch(e) {
-            select.value = "none";
+            select.value = "whitenoise";
           }
         }
         return;
@@ -2135,27 +2137,35 @@
 
       switch(type) {
         case "whitenoise":
+          console.log('[Sounds] Generating white noise');
           generateWhiteNoise();
           break;
         case "pinknoise":
+          console.log('[Sounds] Generating pink noise');
           generatePinkNoise();
           break;
         case "brownnoise":
+          console.log('[Sounds] Generating brown noise');
           generateBrownNoise();
           break;
         case "rain":
+          console.log('[Sounds] Generating rain');
           generateRain();
           break;
         case "ocean":
+          console.log('[Sounds] Generating ocean');
           generateOcean();
           break;
         case "forest":
+          console.log('[Sounds] Generating forest');
           generateForest();
           break;
         case "fireplace":
+          console.log('[Sounds] Generating fireplace');
           generateFireplace();
           break;
         default:
+          console.log('[Sounds] Stopping all sounds (none selected)');
           stopAllSounds();
       }
 
@@ -2172,12 +2182,14 @@
 
         // Play current sound type
         const soundType = soundTypeSelect ? soundTypeSelect.value : "whitenoise";
+        console.log('[Sounds] Enabling sounds, type:', soundType);
         if (soundType && soundType !== "none") {
           playSoundType(soundType);
         }
       } else {
         toggle.classList.remove("on");
         toggle.setAttribute("aria-checked", "false");
+        console.log('[Sounds] Disabling sounds');
         stopAllSounds();
       }
 
@@ -2205,8 +2217,8 @@
         if (stored === "true") enabled = true;
       } catch(e) {}
 
-      let soundType = "none";
-      try { soundType = localStorage.getItem(SOUND_TYPE_KEY) || "none"; } catch(e) {}
+      let soundType = "whitenoise";
+      try { soundType = localStorage.getItem(SOUND_TYPE_KEY) || "whitenoise"; } catch(e) {}
 
       let volume = 30;
       try {
