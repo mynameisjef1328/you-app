@@ -694,6 +694,115 @@
       stroke-linejoin: round;
     }
 
+    .lockIcon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.6;
+    }
+
+    .lockIcon svg {
+      width: 16px;
+      height: 16px;
+      stroke: rgba(255,255,255,0.7);
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .row.locked {
+      opacity: 0.6;
+      cursor: pointer;
+    }
+
+    .row.locked:hover {
+      opacity: 0.75;
+    }
+
+    .favoriteBtn {
+      position: absolute;
+      top: calc(22% - 45px);
+      right: calc(10% + var(--safe-right));
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+      z-index: 3;
+    }
+
+    .favoriteBtn.visible {
+      opacity: 0.85;
+    }
+
+    .favoriteBtn:hover {
+      opacity: 1;
+      background: rgba(255,255,255,0.16);
+      transform: scale(1.05);
+    }
+
+    .favoriteBtn:active {
+      transform: scale(0.95);
+    }
+
+    .favoriteBtn svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: fill 0.2s ease;
+    }
+
+    .favoriteBtn.favorited svg {
+      fill: #ff6b9d;
+      stroke: #ff6b9d;
+    }
+
+    .historyList {
+      max-height: 300px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .historyItem {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.9;
+      position: relative;
+    }
+
+    .historyItem:last-child {
+      margin-bottom: 0;
+    }
+
+    .historyTime {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-top: 6px;
+    }
+
+    .emptyState {
+      padding: 24px;
+      text-align: center;
+      opacity: 0.7;
+      font-size: 14px;
+    }
+
     .comingSoonTitle {
       font-size: 18px;
       font-weight: 700;
@@ -758,6 +867,12 @@
 
     <div id="affirmation"></div>
 
+    <button class="favoriteBtn" id="favoriteBtn" type="button" aria-label="Favorite this affirmation">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+    </button>
+
     <div id="tapHalo"></div>
 
     <div class="circle-button breathing-on" id="tapButton" data-event="tap_button">
@@ -816,6 +931,86 @@
             <div class="check" data-theme-check="ember" aria-hidden="true"></div>
           </div>
 
+          <div class="row locked" data-theme="ocean" data-premium="true" data-event="theme_select" data-theme-name="ocean" role="button" tabindex="0" aria-label="Select Ocean background - Plus only">
+            <div class="rowLeft">
+              <div class="swatch" style="background: linear-gradient(to bottom, #667eea, #764ba2)"></div>
+              <div>
+                <div class="rowTitle">Ocean</div>
+                <div class="rowSub">Deep water serenity</div>
+              </div>
+            </div>
+            <div class="lockIcon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="row locked" data-theme="rose" data-premium="true" data-event="theme_select" data-theme-name="rose" role="button" tabindex="0" aria-label="Select Rose background - Plus only">
+            <div class="rowLeft">
+              <div class="swatch" style="background: linear-gradient(to bottom, #f093fb, #f5576c)"></div>
+              <div>
+                <div class="rowTitle">Rose</div>
+                <div class="rowSub">Soft blush warmth</div>
+              </div>
+            </div>
+            <div class="lockIcon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="row locked" data-theme="forest" data-premium="true" data-event="theme_select" data-theme-name="forest" role="button" tabindex="0" aria-label="Select Forest background - Plus only">
+            <div class="rowLeft">
+              <div class="swatch" style="background: linear-gradient(to bottom, #134e5e, #71b280)"></div>
+              <div>
+                <div class="rowTitle">Forest</div>
+                <div class="rowSub">Grounded earth green</div>
+              </div>
+            </div>
+            <div class="lockIcon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="row locked" data-theme="sunset" data-premium="true" data-event="theme_select" data-theme-name="sunset" role="button" tabindex="0" aria-label="Select Sunset background - Plus only">
+            <div class="rowLeft">
+              <div class="swatch" style="background: linear-gradient(to bottom, #ff6e7f, #bfe9ff)"></div>
+              <div>
+                <div class="rowTitle">Sunset</div>
+                <div class="rowSub">Golden hour peace</div>
+              </div>
+            </div>
+            <div class="lockIcon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+          </div>
+
+          <div class="row locked" data-theme="midnight" data-premium="true" data-event="theme_select" data-theme-name="midnight" role="button" tabindex="0" aria-label="Select Midnight background - Plus only">
+            <div class="rowLeft">
+              <div class="swatch" style="background: linear-gradient(to bottom, #232526, #414345)"></div>
+              <div>
+                <div class="rowTitle">Midnight</div>
+                <div class="rowSub">Deep night stillness</div>
+              </div>
+            </div>
+            <div class="lockIcon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+          </div>
+
           <div class="divider"></div>
 
           <div class="sectionLabel">Breathing</div>
@@ -838,8 +1033,31 @@
               <option value="gentle">Gentle</option>
               <option value="steady">Steady</option>
               <option value="deep">Deep</option>
+              <option value="calm" data-premium="true">Calm (Plus) 🔒</option>
+              <option value="focused" data-premium="true">Focused (Plus) 🔒</option>
+              <option value="meditative" data-premium="true">Meditative (Plus) 🔒</option>
             </select>
             <div class="helperText">Pick a rhythm that feels right.</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="sectionLabel">Favorites</div>
+          <div id="favoritesSection">
+            <div class="emptyState" id="emptyFavorites">
+              Tap the heart icon to save your favorite affirmations.
+            </div>
+            <div class="historyList" id="favoritesList" style="display: none;"></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="sectionLabel">History</div>
+          <div id="historySection">
+            <div class="emptyState" id="emptyHistory">
+              Your recent affirmations will appear here.
+            </div>
+            <div class="historyList" id="historyList" style="display: none;"></div>
           </div>
 
           <div class="divider"></div>
@@ -1081,11 +1299,19 @@
     function showNextAffirmation(initial = false) {
       const message = getNextAffirmation();
 
+      // Show favorite button
+      const favoriteBtn = document.getElementById("favoriteBtn");
+      if (favoriteBtn) {
+        favoriteBtn.classList.add("visible");
+      }
+
       if (initial) {
         affirmationBox.textContent = message;
         affirmationBox.style.opacity = 1;
         affirmationBox.style.transform = "translate(-50%, 0px)";
         affirmationBox.style.filter = "blur(0px)";
+        updateFavoriteButtonState();
+        addToHistory(message);
         return;
       }
 
@@ -1098,6 +1324,8 @@
         affirmationBox.style.opacity = 1;
         affirmationBox.style.transform = "translate(-50%, 0px)";
         affirmationBox.style.filter = "blur(0px)";
+        updateFavoriteButtonState();
+        addToHistory(message);
       }, 250);
     }
 
@@ -1181,13 +1409,24 @@
     const BREATH_STYLE_KEY = "youBreathingStyle_v1";
 
     const THEMES = {
-      mist: { top: "#c9b6e4", bottom: "#616b80" },
-      dusk: { top: "#b8a7de", bottom: "#3a3f55" },
-      ember: { top: "#252535", bottom: "#664333" }
+      mist: { top: "#c9b6e4", bottom: "#616b80", premium: false },
+      dusk: { top: "#b8a7de", bottom: "#3a3f55", premium: false },
+      ember: { top: "#252535", bottom: "#664333", premium: false },
+      ocean: { top: "#667eea", bottom: "#764ba2", premium: true },
+      rose: { top: "#f093fb", bottom: "#f5576c", premium: true },
+      forest: { top: "#134e5e", bottom: "#71b280", premium: true },
+      sunset: { top: "#ff6e7f", bottom: "#bfe9ff", premium: true },
+      midnight: { top: "#232526", bottom: "#414345", premium: true }
     };
 
     function setTheme(themeId) {
       const t = THEMES[themeId] || THEMES.mist;
+
+      // Check if theme is premium and user doesn't have Plus
+      if (t.premium && !isPlusUser()) {
+        return requiresPlus("premium_background");
+      }
+
       document.documentElement.style.setProperty("--bg-top", t.top);
       document.documentElement.style.setProperty("--bg-bottom", t.bottom);
 
@@ -1204,7 +1443,23 @@
         `;
       }
 
+      // Update lock icons visibility based on Plus status
+      updatePremiumThemeUI();
+
       try { localStorage.setItem(BG_KEY, themeId); } catch(e){}
+    }
+
+    function updatePremiumThemeUI() {
+      const isPlusActive = isPlusUser();
+      document.querySelectorAll("[data-premium='true']").forEach(row => {
+        if (isPlusActive) {
+          row.classList.remove("locked");
+          const lockIcon = row.querySelector(".lockIcon");
+          if (lockIcon) lockIcon.remove();
+        } else {
+          row.classList.add("locked");
+        }
+      });
     }
 
     function setBreathingEnabled(enabled) {
@@ -1226,26 +1481,61 @@
     }
 
     function setBreathingStyle(style) {
+      // Check if style is premium
+      const premiumStyles = ["calm", "focused", "meditative"];
+      if (premiumStyles.includes(style) && !isPlusUser()) {
+        requiresPlus("premium_breathing");
+        // Reset to last valid style
+        const select = document.getElementById("breathingStyleSelect");
+        if (select) {
+          try {
+            const lastStyle = localStorage.getItem(BREATH_STYLE_KEY) || "gentle";
+            select.value = lastStyle;
+          } catch(e) {
+            select.value = "gentle";
+          }
+        }
+        return;
+      }
+
       if (style === "steady") {
-      document.documentElement.style.setProperty("--breath-duration", "3.2s");
-      document.documentElement.style.setProperty("--breath-scale-min", "0.99");
-      document.documentElement.style.setProperty("--breath-scale-max", "1.05");
-      document.documentElement.style.setProperty("--breath-shadow-min", "0.18");
-      document.documentElement.style.setProperty("--breath-shadow-max", "0.34");
-    } else if (style === "deep") {
-      document.documentElement.style.setProperty("--breath-duration", "5.8s");
-      document.documentElement.style.setProperty("--breath-scale-min", "0.975");
-      document.documentElement.style.setProperty("--breath-scale-max", "1.07");
-      document.documentElement.style.setProperty("--breath-shadow-min", "0.16");
-      document.documentElement.style.setProperty("--breath-shadow-max", "0.42");
-    } else {
-      // gentle
-      document.documentElement.style.setProperty("--breath-duration", "4.2s");
-      document.documentElement.style.setProperty("--breath-scale-min", "0.985");
-      document.documentElement.style.setProperty("--breath-scale-max", "1.055");
-      document.documentElement.style.setProperty("--breath-shadow-min", "0.18");
-      document.documentElement.style.setProperty("--breath-shadow-max", "0.38");
-    }
+        document.documentElement.style.setProperty("--breath-duration", "3.2s");
+        document.documentElement.style.setProperty("--breath-scale-min", "0.99");
+        document.documentElement.style.setProperty("--breath-scale-max", "1.05");
+        document.documentElement.style.setProperty("--breath-shadow-min", "0.18");
+        document.documentElement.style.setProperty("--breath-shadow-max", "0.34");
+      } else if (style === "deep") {
+        document.documentElement.style.setProperty("--breath-duration", "5.8s");
+        document.documentElement.style.setProperty("--breath-scale-min", "0.975");
+        document.documentElement.style.setProperty("--breath-scale-max", "1.07");
+        document.documentElement.style.setProperty("--breath-shadow-min", "0.16");
+        document.documentElement.style.setProperty("--breath-shadow-max", "0.42");
+      } else if (style === "calm") {
+        document.documentElement.style.setProperty("--breath-duration", "6.5s");
+        document.documentElement.style.setProperty("--breath-scale-min", "0.98");
+        document.documentElement.style.setProperty("--breath-scale-max", "1.045");
+        document.documentElement.style.setProperty("--breath-shadow-min", "0.15");
+        document.documentElement.style.setProperty("--breath-shadow-max", "0.32");
+      } else if (style === "focused") {
+        document.documentElement.style.setProperty("--breath-duration", "2.8s");
+        document.documentElement.style.setProperty("--breath-scale-min", "0.995");
+        document.documentElement.style.setProperty("--breath-scale-max", "1.035");
+        document.documentElement.style.setProperty("--breath-shadow-min", "0.20");
+        document.documentElement.style.setProperty("--breath-shadow-max", "0.30");
+      } else if (style === "meditative") {
+        document.documentElement.style.setProperty("--breath-duration", "8.0s");
+        document.documentElement.style.setProperty("--breath-scale-min", "0.97");
+        document.documentElement.style.setProperty("--breath-scale-max", "1.08");
+        document.documentElement.style.setProperty("--breath-shadow-min", "0.12");
+        document.documentElement.style.setProperty("--breath-shadow-max", "0.45");
+      } else {
+        // gentle (default)
+        document.documentElement.style.setProperty("--breath-duration", "4.2s");
+        document.documentElement.style.setProperty("--breath-scale-min", "0.985");
+        document.documentElement.style.setProperty("--breath-scale-max", "1.055");
+        document.documentElement.style.setProperty("--breath-shadow-min", "0.18");
+        document.documentElement.style.setProperty("--breath-shadow-max", "0.38");
+      }
 
       const select = document.getElementById("breathingStyleSelect");
       if (select) select.value = style;
@@ -1273,6 +1563,193 @@
     }
 
     initSavedSettings();
+    updatePremiumThemeUI();
+
+    /* ================================
+       FAVORITES & HISTORY SYSTEM
+       ================================ */
+    const FAVORITES_KEY = "youFavorites_v1";
+    const HISTORY_KEY = "youHistory_v1";
+    const MAX_HISTORY = 20;
+
+    function getFavorites() {
+      try {
+        const stored = localStorage.getItem(FAVORITES_KEY);
+        return stored ? JSON.parse(stored) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function saveFavorites(favorites) {
+      try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+      } catch(e) {}
+    }
+
+    function getHistory() {
+      try {
+        const stored = localStorage.getItem(HISTORY_KEY);
+        return stored ? JSON.parse(stored) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function saveHistory(history) {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      } catch(e) {}
+    }
+
+    function addToHistory(affirmation) {
+      if (!isPlusUser()) return; // History is Plus only
+
+      const history = getHistory();
+      const entry = {
+        text: affirmation,
+        timestamp: Date.now()
+      };
+
+      // Remove if already exists
+      const filtered = history.filter(h => h.text !== affirmation);
+
+      // Add to beginning
+      filtered.unshift(entry);
+
+      // Keep only MAX_HISTORY items
+      const trimmed = filtered.slice(0, MAX_HISTORY);
+
+      saveHistory(trimmed);
+      updateHistoryUI();
+    }
+
+    function toggleFavorite(affirmation) {
+      if (!isPlusUser()) {
+        return requiresPlus("favorites");
+      }
+
+      const favorites = getFavorites();
+      const index = favorites.findIndex(f => f.text === affirmation);
+
+      if (index > -1) {
+        // Remove from favorites
+        favorites.splice(index, 1);
+        trackEvent("favorite_removed", { affirmation });
+      } else {
+        // Add to favorites
+        favorites.unshift({
+          text: affirmation,
+          timestamp: Date.now()
+        });
+        trackEvent("favorite_added", { affirmation });
+      }
+
+      saveFavorites(favorites);
+      updateFavoritesUI();
+      updateFavoriteButtonState();
+    }
+
+    function updateFavoriteButtonState() {
+      const favoriteBtn = document.getElementById("favoriteBtn");
+      if (!favoriteBtn) return;
+
+      const currentAffirmation = affirmationBox.textContent;
+      if (!currentAffirmation) return;
+
+      const favorites = getFavorites();
+      const isFavorited = favorites.some(f => f.text === currentAffirmation);
+
+      if (isFavorited) {
+        favoriteBtn.classList.add("favorited");
+      } else {
+        favoriteBtn.classList.remove("favorited");
+      }
+    }
+
+    function formatTimeAgo(timestamp) {
+      const seconds = Math.floor((Date.now() - timestamp) / 1000);
+
+      if (seconds < 60) return "Just now";
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+      return `${Math.floor(seconds / 86400)}d ago`;
+    }
+
+    function updateHistoryUI() {
+      const historyList = document.getElementById("historyList");
+      const emptyHistory = document.getElementById("emptyHistory");
+
+      if (!historyList || !emptyHistory) return;
+
+      const history = getHistory();
+
+      if (!isPlusUser() || history.length === 0) {
+        historyList.style.display = "none";
+        emptyHistory.style.display = "block";
+
+        if (!isPlusUser()) {
+          emptyHistory.textContent = "History is a You Plus feature. Upgrade to track your affirmations.";
+        } else {
+          emptyHistory.textContent = "Your recent affirmations will appear here.";
+        }
+        return;
+      }
+
+      emptyHistory.style.display = "none";
+      historyList.style.display = "block";
+      historyList.innerHTML = history.map(entry => `
+        <div class="historyItem">
+          ${entry.text}
+          <div class="historyTime">${formatTimeAgo(entry.timestamp)}</div>
+        </div>
+      `).join('');
+    }
+
+    function updateFavoritesUI() {
+      const favoritesList = document.getElementById("favoritesList");
+      const emptyFavorites = document.getElementById("emptyFavorites");
+
+      if (!favoritesList || !emptyFavorites) return;
+
+      const favorites = getFavorites();
+
+      if (!isPlusUser() || favorites.length === 0) {
+        favoritesList.style.display = "none";
+        emptyFavorites.style.display = "block";
+
+        if (!isPlusUser()) {
+          emptyFavorites.textContent = "Favorites is a You Plus feature. Upgrade to save your favorite affirmations.";
+        } else {
+          emptyFavorites.textContent = "Tap the heart icon to save your favorite affirmations.";
+        }
+        return;
+      }
+
+      emptyFavorites.style.display = "none";
+      favoritesList.style.display = "block";
+      favoritesList.innerHTML = favorites.map(entry => `
+        <div class="historyItem">
+          ${entry.text}
+          <div class="historyTime">${formatTimeAgo(entry.timestamp)}</div>
+        </div>
+      `).join('');
+    }
+
+    // Initialize UI
+    updateHistoryUI();
+    updateFavoritesUI();
+
+    // Favorite button handler
+    const favoriteBtn = document.getElementById("favoriteBtn");
+    if (favoriteBtn) {
+      favoriteBtn.addEventListener("click", () => {
+        const currentAffirmation = affirmationBox.textContent;
+        if (currentAffirmation) {
+          toggleFavorite(currentAffirmation);
+        }
+      });
+    }
 
     /* ================================
        UI EVENTS FOR SETTINGS
@@ -1453,6 +1930,11 @@
         if (!plusBox.querySelector(".ownedBadge")) {
           plusBox.appendChild(ownedBadge);
         }
+
+        // Unlock premium features
+        updatePremiumThemeUI();
+        updateHistoryUI();
+        updateFavoritesUI();
       } else {
         // User hasn't purchased - show purchase button
         purchaseBtn.style.display = "flex";
