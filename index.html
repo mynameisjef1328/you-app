@@ -668,6 +668,26 @@
       stroke-linejoin: round;
     }
 
+    .restoreBtn {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: transparent;
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+    }
+
+    .restoreBtn:active {
+      opacity: 0.7;
+    }
+
     .ownedBadge {
       width: 100%;
       padding: 12px 16px;
@@ -1100,7 +1120,10 @@
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="M12 6v6l4 2"></path>
               </svg>
-              Get You Plus
+              Get You Plus — $4.99
+            </button>
+            <button class="restoreBtn" id="restoreBtn" type="button" data-event="restore_click">
+              Restore Previous Purchase
             </button>
           </div>
 
@@ -1909,12 +1932,14 @@
     function updatePlusUI() {
       const plusBox = document.getElementById("plusBox");
       const purchaseBtn = document.getElementById("purchaseBtn");
+      const restoreBtn = document.getElementById("restoreBtn");
 
       if (!plusBox || !purchaseBtn) return;
 
       if (isPlusUser()) {
-        // User has purchased - show "owned" state
+        // User has purchased - hide both buttons
         purchaseBtn.style.display = "none";
+        if (restoreBtn) restoreBtn.style.display = "none";
 
         const ownedBadge = document.createElement("div");
         ownedBadge.className = "ownedBadge";
@@ -1936,8 +1961,9 @@
         updateHistoryUI();
         updateFavoritesUI();
       } else {
-        // User hasn't purchased - show purchase button
+        // User hasn't purchased - show purchase and restore buttons
         purchaseBtn.style.display = "flex";
+        if (restoreBtn) restoreBtn.style.display = "block";
         const existingBadge = plusBox.querySelector(".ownedBadge");
         if (existingBadge) existingBadge.remove();
       }
@@ -1947,74 +1973,52 @@
     updatePlusUI();
 
     /* ================================
-       PAYMENT INTEGRATION - STRIPE PAYMENT LINKS
+       PAYMENT INTEGRATION - APPLE IN-APP PURCHASE (STOREKIT)
        ================================ */
     const purchaseBtn = document.getElementById("purchaseBtn");
+    const restoreBtn = document.getElementById("restoreBtn");
 
-    // STRIPE PAYMENT LINK SETUP INSTRUCTIONS:
-    //
-    // 1. Go to https://dashboard.stripe.com/payment-links
-    // 2. Click "New payment link"
-    // 3. Set up your product:
-    //    - Name: "You Plus"
-    //    - Price: $4.99 USD (one-time)
-    //    - Description: "Unlock all premium features"
-    // 4. Set success URL to: https://yourdomain.com?purchase=success
-    // 5. Copy the payment link (looks like: https://buy.stripe.com/xxxxx)
-    // 6. Paste it in the STRIPE_PAYMENT_LINK constant below
-    //
-    // That's it! Apple Pay, Google Pay, and credit cards work automatically.
-
-    const STRIPE_PAYMENT_LINK = ""; // Paste your Stripe Payment Link here
+    // Called by Swift (via WKWebView.evaluateJavaScript) after a purchase attempt.
+    // result values: "purchased" | "restored" | "cancelled" | "failed"
+    window.iapResult = function(result) {
+      if (result === "purchased" || result === "restored") {
+        handlePurchaseSuccess(result === "restored");
+      } else if (result === "failed") {
+        alert("Something went wrong with your purchase. Please try again.");
+      }
+      // "cancelled" — user dismissed the sheet, do nothing
+    };
 
     if (purchaseBtn) {
-      purchaseBtn.addEventListener("click", async () => {
+      purchaseBtn.addEventListener("click", () => {
         trackEvent("purchase_initiated");
-
-        // Check if Stripe Payment Link is configured
-        if (!STRIPE_PAYMENT_LINK || STRIPE_PAYMENT_LINK === "") {
-          // DEMO MODE - Remove this after adding your Stripe link
-          const confirmed = confirm(
-            "Demo Mode\n\n" +
-            "Payment integration is ready! To enable real purchases:\n\n" +
-            "1. Create a Stripe Payment Link (free account)\n" +
-            "2. Paste it in the code (see comments at line ~1440)\n" +
-            "3. That's it - Apple Pay & credit cards work automatically\n\n" +
-            "Press OK to simulate a successful purchase."
-          );
-
-          if (confirmed) {
-            handlePurchaseSuccess();
-          }
-          return;
+        // Tell Swift to start the StoreKit purchase flow
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iap) {
+          window.webkit.messageHandlers.iap.postMessage({ action: "buy", productId: "com.mynameisjef.you.youplus" });
         }
-
-        // PRODUCTION MODE - Redirect to Stripe Payment Link
-        // Includes Apple Pay, Google Pay, and all credit cards automatically
-        // Stripe handles the entire checkout experience
-        window.location.href = STRIPE_PAYMENT_LINK;
       });
     }
 
-    function handlePurchaseSuccess() {
-      setPlusUser(true);
-      trackEvent("purchase_completed");
-
-      // Show success message
-      alert("Welcome to You Plus! ✨\n\nAll premium features are now unlocked.");
-
-      // Close menu after purchase
-      setTimeout(() => {
-        closeMenu();
-      }, 500);
+    if (restoreBtn) {
+      restoreBtn.addEventListener("click", () => {
+        trackEvent("restore_initiated");
+        // Tell Swift to restore previous purchases
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iap) {
+          window.webkit.messageHandlers.iap.postMessage({ action: "restore" });
+        }
+      });
     }
 
-    // Check URL for purchase success (useful for Stripe redirects)
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('purchase') === 'success') {
-      handlePurchaseSuccess();
-      // Clean URL
-      window.history.replaceState({}, document.title, window.location.pathname);
+    function handlePurchaseSuccess(isRestore = false) {
+      setPlusUser(true);
+      trackEvent("purchase_completed", { restore: isRestore });
+
+      const message = isRestore
+        ? "Purchase restored! ✨\n\nAll premium features are unlocked."
+        : "Welcome to You Plus! ✨\n\nAll premium features are now unlocked.";
+      alert(message);
+
+      setTimeout(() => { closeMenu(); }, 500);
     }
 
     // FEATURE GATING HELPER
