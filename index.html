@@ -2252,6 +2252,199 @@
     /* ================================================================
        END TESTING MODE PART 2
        ================================================================ */
+
+    /* ================================================================
+       TESTING MODE — PART 3: GitHub PR creation for approved validation updates
+       // TESTING MODE — REMOVE THIS ENTIRE BLOCK BEFORE PUBLISHING
+       ================================================================ */
+
+    // REMOVE BEFORE PUBLISHING — testing mode only
+    var GITHUB_TOKEN = ''; // Tester will paste their token here
+    var GITHUB_REPO  = 'mynameisjef1328/workflow-advisor';
+
+    // TESTING MODE: Encode a UTF-8 string to base64 (handles non-ASCII safely)
+    function _tmBase64Encode(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    // TESTING MODE: Decode base64 to UTF-8 string
+    function _tmBase64Decode(b64) {
+      return decodeURIComponent(escape(atob(b64.replace(/\n/g, ''))));
+    }
+
+    // TESTING MODE: Create a GitHub PR with validation.md and index.html updates.
+    // payload: { validation_md_section, validation_md_rule, index_html_rule, commit_message }
+    async function createValidationPR(payload) {
+      var section    = payload.validation_md_section;
+      var mdRule     = payload.validation_md_rule;
+      var htmlRule   = payload.index_html_rule;
+      var commitMsg  = payload.commit_message;
+      var timestamp  = Math.floor(Date.now() / 1000);
+      var branch     = 'testing/validation-update-' + timestamp;
+      var apiBase    = 'https://api.github.com/repos/' + GITHUB_REPO;
+      var headers    = {
+        'Authorization': 'token ' + GITHUB_TOKEN,
+        'Accept':        'application/vnd.github.v3+json',
+        'Content-Type':  'application/json'
+      };
+
+      // 1. Get SHA of main branch head
+      var refResp = await fetch(apiBase + '/git/ref/heads/main', { headers: headers });
+      if (!refResp.ok) {
+        throw new Error('Failed to get main SHA: ' + refResp.status + ' ' + await refResp.text());
+      }
+      var mainSHA = (await refResp.json()).object.sha;
+
+      // 2. Create new branch off main
+      var createBranchResp = await fetch(apiBase + '/git/refs', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ ref: 'refs/heads/' + branch, sha: mainSHA })
+      });
+      if (!createBranchResp.ok) {
+        throw new Error('Failed to create branch: ' + createBranchResp.status + ' ' + await createBranchResp.text());
+      }
+
+      // 3. Fetch current validation.md (may not exist yet)
+      var validationResp = await fetch(apiBase + '/contents/skills/validation.md?ref=' + branch, { headers: headers });
+      var validationContent = '';
+      var validationSHA     = null;
+      if (validationResp.ok) {
+        var vData = await validationResp.json();
+        validationContent = _tmBase64Decode(vData.content);
+        validationSHA     = vData.sha;
+      }
+
+      // 4. Insert rule under correct section (or append new section)
+      var sectionHeader = '## ' + section;
+      if (validationContent.indexOf(sectionHeader) !== -1) {
+        var sectionIdx   = validationContent.indexOf(sectionHeader);
+        var afterHeader  = validationContent.indexOf('\n', sectionIdx) + 1;
+        var nextMatch    = validationContent.slice(afterHeader).match(/\n## /);
+        var insertAt     = nextMatch
+          ? afterHeader + nextMatch.index + 1
+          : validationContent.length;
+        validationContent =
+          validationContent.slice(0, insertAt) +
+          mdRule + '\n' +
+          validationContent.slice(insertAt);
+      } else {
+        validationContent += '\n' + sectionHeader + '\n' + mdRule + '\n';
+      }
+
+      // 5. Commit updated validation.md
+      var vCommitBody = {
+        message: commitMsg,
+        content: _tmBase64Encode(validationContent),
+        branch:  branch
+      };
+      if (validationSHA) vCommitBody.sha = validationSHA;
+      var vCommitResp = await fetch(apiBase + '/contents/skills/validation.md', {
+        method:  'PUT',
+        headers: headers,
+        body:    JSON.stringify(vCommitBody)
+      });
+      if (!vCommitResp.ok) {
+        throw new Error('Failed to commit validation.md: ' + vCommitResp.status + ' ' + await vCommitResp.text());
+      }
+
+      // 6. Fetch current index.html
+      var indexResp = await fetch(apiBase + '/contents/index.html?ref=' + branch, { headers: headers });
+      if (!indexResp.ok) {
+        throw new Error('Failed to fetch index.html: ' + indexResp.status + ' ' + await indexResp.text());
+      }
+      var iData        = await indexResp.json();
+      var indexContent = _tmBase64Decode(iData.content);
+      var indexSHA     = iData.sha;
+
+      // 7. Insert lean rule just before the TESTING MODE PART 2 anchor
+      //    (i.e., right before the testing mode prompt addition block).
+      //    Falls back to inserting before </script> if the anchor isn't found.
+      var anchor = '=== TESTING MODE ACTIVE ===';
+      var anchorPos = indexContent.indexOf(anchor);
+      if (anchorPos !== -1) {
+        var lineStart = indexContent.lastIndexOf('\n', anchorPos) + 1;
+        indexContent =
+          indexContent.slice(0, lineStart) +
+          '    // [Auto-added lean rule — ' + new Date().toISOString().slice(0, 10) + ']\n' +
+          '    // ' + htmlRule.replace(/\n/g, '\n    // ') + '\n\n' +
+          indexContent.slice(lineStart);
+      } else {
+        indexContent = indexContent.replace(
+          '</script>',
+          '    // [Auto-added lean rule — ' + new Date().toISOString().slice(0, 10) + ']\n' +
+          '    // ' + htmlRule.replace(/\n/g, '\n    // ') + '\n  </script>'
+        );
+      }
+
+      // 8. Commit updated index.html
+      var iCommitResp = await fetch(apiBase + '/contents/index.html', {
+        method:  'PUT',
+        headers: headers,
+        body:    JSON.stringify({
+          message: commitMsg + ' (index.html lean rule)',
+          content: _tmBase64Encode(indexContent),
+          sha:     indexSHA,
+          branch:  branch
+        })
+      });
+      if (!iCommitResp.ok) {
+        throw new Error('Failed to commit index.html: ' + iCommitResp.status + ' ' + await iCommitResp.text());
+      }
+
+      // 9. Create Pull Request
+      var prBody =
+        'Auto-generated from Testing Mode correction.\n\n' +
+        '**validation.md addition:**\n```\n' + mdRule + '\n```\n\n' +
+        '**index.html addition:**\n```\n' + htmlRule + '\n```';
+      var prResp = await fetch(apiBase + '/pulls', {
+        method:  'POST',
+        headers: headers,
+        body:    JSON.stringify({ title: commitMsg, body: prBody, head: branch, base: 'main' })
+      });
+      if (!prResp.ok) {
+        throw new Error('Failed to create PR: ' + prResp.status + ' ' + await prResp.text());
+      }
+      var prData = await prResp.json();
+      return { number: prData.number, url: prData.html_url };
+    }
+
+    // TESTING MODE: Call this after every Advisor response message.
+    // displayMessageFn(text) should append a message to your chat UI.
+    // If [PR_APPROVED] is detected and TESTING_MODE is active, creates the GitHub PR.
+    window.handleAdvisorResponse = async function (responseText, displayMessageFn) {
+      if (!window.TESTING_MODE) return;
+
+      var result = window.parsePRApproved(responseText);
+      if (!result.found) return;
+
+      var payload = result.payload;
+
+      // No token configured — fall back to copy-friendly display
+      if (!GITHUB_TOKEN) {
+        var fallback =
+          '\u26a0\ufe0f GitHub token not configured — copy the rules above and apply manually.\n\n' +
+          '**validation.md rule:**\n```\n' + payload.validation_md_rule + '\n```\n\n' +
+          '**index.html lean rule:**\n```\n' + payload.index_html_rule + '\n```\n\n' +
+          '**Commit message:** ' + payload.commit_message;
+        if (typeof displayMessageFn === 'function') displayMessageFn(fallback);
+        return;
+      }
+
+      if (typeof displayMessageFn === 'function') displayMessageFn('Creating PR\u2026');
+
+      try {
+        var pr = await createValidationPR(payload);
+        var success = '\u2705 PR #' + pr.number + ' created \u2014 [View PR](' + pr.url + '). Ready to merge when you are.';
+        if (typeof displayMessageFn === 'function') displayMessageFn(success);
+      } catch (err) {
+        var failure = '\u26a0\ufe0f PR creation failed: ' + err.message + '. The formatted rules are above \u2014 you can copy them manually.';
+        if (typeof displayMessageFn === 'function') displayMessageFn(failure);
+      }
+    };
+    /* ================================================================
+       END TESTING MODE PART 3
+       ================================================================ */
   </script>
 </body>
 </html>
