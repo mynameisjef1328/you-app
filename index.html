@@ -865,10 +865,57 @@
         max-height: calc(var(--app-height) * 0.70);
       }
     }
+
+    /* ================================
+       TESTING MODE INDICATOR PILL
+       // TESTING MODE — REMOVE BEFORE PUBLISHING
+       ================================ */
+    #testingModePill {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      padding: 6px 14px;
+      background: rgba(0, 0, 0, 0.52);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      z-index: 9999;
+      pointer-events: none;
+      display: none;
+      opacity: 0;
+    }
+
+    #testingModePill.visible {
+      display: block;
+      animation: testingPillFadeIn 0.3s ease forwards;
+    }
+
+    #testingModePill.hiding {
+      animation: testingPillFadeOut 0.3s ease forwards;
+    }
+
+    @keyframes testingPillFadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes testingPillFadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-6px); }
+    }
   </style>
 </head>
 
 <body>
+  <!-- TESTING MODE: Indicator pill — hidden until activated via keyboard secret word -->
+  <!-- // TESTING MODE — REMOVE BEFORE PUBLISHING -->
+  <div id="testingModePill" aria-hidden="true">🔧 Testing Mode</div>
+
   <!-- Launch screen -->
   <div id="launch">
     <div class="logo">you</div>
@@ -2048,6 +2095,71 @@
     // if (requiresPlus("affirmation_history")) {
     //   // Show affirmation history
     // }
+
+    /* ================================================================
+       TESTING MODE — PART 1: Hidden keyboard activation
+       // TESTING MODE — REMOVE THIS ENTIRE BLOCK BEFORE PUBLISHING
+       Activates when the user types the secret word on any focused page.
+       No visible button, URL param, or UI hint exists.
+       ================================================================ */
+    window.TESTING_MODE = false;
+
+    (function () {
+      const SECRET_WORD = 'fernando';
+      const BUFFER_SIZE = SECRET_WORD.length;
+      const charBuffer = [];
+
+      // TESTING MODE: Animate the pill in
+      function showTestingPill() {
+        const pill = document.getElementById('testingModePill');
+        if (!pill) return;
+        pill.classList.remove('hiding');
+        pill.style.display = 'block';
+        // Force reflow so the animation starts fresh
+        void pill.getBoundingClientRect();
+        pill.classList.add('visible');
+      }
+
+      // TESTING MODE: Animate the pill out then hide
+      function hideTestingPill() {
+        const pill = document.getElementById('testingModePill');
+        if (!pill) return;
+        pill.classList.remove('visible');
+        pill.classList.add('hiding');
+        setTimeout(function () {
+          pill.style.display = 'none';
+          pill.classList.remove('hiding');
+        }, 300);
+      }
+
+      // TESTING MODE: Global keydown listener — fires on document so it works
+      // whether or not the chat input field is focused. Only standard letter
+      // keys (a–z) are tracked; special keys (Enter, Shift, Tab, arrows) are ignored.
+      document.addEventListener('keydown', function (e) {
+        // Ignore non-letter keys and modified keys
+        if (e.key.length !== 1 || !/^[a-zA-Z]$/.test(e.key)) return;
+
+        charBuffer.push(e.key.toLowerCase());
+        if (charBuffer.length > BUFFER_SIZE) charBuffer.shift();
+
+        if (charBuffer.join('') === SECRET_WORD) {
+          charBuffer.length = 0; // Clear buffer on match (toggle)
+
+          if (!window.TESTING_MODE) {
+            window.TESTING_MODE = true;
+            showTestingPill();
+            console.log('[Testing Mode] Activated');
+          } else {
+            window.TESTING_MODE = false;
+            hideTestingPill();
+            console.log('[Testing Mode] Deactivated');
+          }
+        }
+      });
+    })();
+    /* ================================================================
+       END TESTING MODE PART 1
+       ================================================================ */
   </script>
 </body>
 </html>
